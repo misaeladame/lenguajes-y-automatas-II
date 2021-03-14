@@ -128,24 +128,78 @@ public class SintacticoSemantico {
         }
     }
     
+    //------------------------------------------------------------------------------
+    
     private void V () {
-        
+        if ( preAnalisis.equals ( "id" ) ) {
+            // V -> id : TV
+            emparejar ( "id" );
+            emparejar ( ":" );
+            T ();
+            V ();
+        } else {
+            // V -> empty
+        }
     }
+    
+    //------------------------------------------------------------------------------
     
     private void T () {
-        
+        if ( preAnalisis.equals ( "entero" ) ) {
+            // T -> entero
+            emparejar ( "entero" );
+        } else if ( preAnalisis.equals ( "real" ) ) {
+            // T -> real
+            emparejar ( "real" );
+        } else if ( preAnalisis.equals ( "caracter" ) ) {
+            // T -> caracter 
+            emparejar ( "caracter" );
+        } else {
+            error ("[T] " + cmp.be.preAnalisis.numLinea );
+        }
     }
     
+    //------------------------------------------------------------------------------
+    
     private void C () {
-        
+        if ( preAnalisis.equals ( "inicio" ) ) {
+            // C -> inicio S end 
+            emparejar ( "inicio" );
+            S ();
+            emparejar ( "fin" );
+            
+        } else {
+            error ("[C] " + cmp.be.preAnalisis.numLinea );
+        }
     }
     
     private void S () {
-        
+        if ( preAnalisis.equals ( "id" ) ) {
+            // S -> id opasig E S
+            emparejar ( "id" );
+            emparejar ( "opasig" );
+            E ();
+            S ();
+        } else {
+            // S -> empty
+        }
     }
     
+    //------------------------------------------------------------------------------
+    
     private void E () {
-        
+        if ( preAnalisis.equals ( "id" ) ) {
+            // E -> id
+            emparejar ( "id" );
+        } else if ( preAnalisis.equals ( "num" ) ) {
+            // E -> num
+            emparejar ( "num" );
+        } else if ( preAnalisis.equals ( "num.num" ) ) {
+            // E -> num.num
+            emparejar ( "num.num" );
+        } else {
+            error ("[E] " + cmp.be.preAnalisis.numLinea );
+        }
     }
 }
 //------------------------------------------------------------------------------
