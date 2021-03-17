@@ -137,9 +137,10 @@ public class SintacticoSemantico {
             emparejar ( ":" );
             T ();
             V ();
-        } else {
+        } 
+        /*else {
             // V -> empty
-        }
+        }*/
     }
     
     //------------------------------------------------------------------------------
@@ -155,7 +156,8 @@ public class SintacticoSemantico {
             // T -> caracter 
             emparejar ( "caracter" );
         } else {
-            error ("[T] " + cmp.be.preAnalisis.numLinea );
+            error ("[T]: Se esperaba un tipo de dato: entero, real o caracter. No. de Línea " 
+                    + cmp.be.preAnalisis.numLinea );
         }
     }
     
@@ -167,11 +169,13 @@ public class SintacticoSemantico {
             emparejar ( "inicio" );
             S ();
             emparejar ( "fin" );
-            
         } else {
-            error ("[C] " + cmp.be.preAnalisis.numLinea );
+            error ("[C]: El cuerpo del programa debe comenzar con la palabra inicio. "
+                    + "No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
+    
+    //------------------------------------------------------------------------------
     
     private void S () {
         if ( preAnalisis.equals ( "id" ) ) {
@@ -198,7 +202,8 @@ public class SintacticoSemantico {
             // E -> num.num
             emparejar ( "num.num" );
         } else {
-            error ("[E] " + cmp.be.preAnalisis.numLinea );
+            error ("[E]: Expresion invalida, debe iniciar con un identificador o " +
+                   "con constante numerica. No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
 }
