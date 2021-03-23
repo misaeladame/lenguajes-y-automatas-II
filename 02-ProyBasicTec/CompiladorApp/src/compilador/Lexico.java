@@ -31,6 +31,8 @@
  *:                                 literales entre comillas sencillas.
  *: 08/Sep/2017 FGil               -Cambiar el token opasig por opasigna.
  *: 09/Sep/2019 FGil               -Se renombro token opasigna por opasig.
+ *: 19/Mar/2021 Misael Adame       -Se agregaron la lista de palabras reservadas
+ *:                                 del lenguaje BasicTec.
  *:-----------------------------------------------------------------------------
  */
 
@@ -218,6 +220,21 @@ public class Lexico {
    private Boolean EsPalabraReservada(String lex)
    {      
        String palres[] = { 
+                            "end",
+                            "dim",
+                            "as",
+                            "integer",
+                            "single",
+                            "string",
+                            "function",
+                            "sub",
+                            "call",
+                            "if",
+                            "then",
+                            "else",
+                            "do",
+                            "while",
+                            "loop"
                          };
        for (int i = 0; i < palres.length; i++) {
            if (lex.equals ( palres[i] ) ) {       
