@@ -1,0 +1,123 @@
+P -> V C
+V -> id : T V | empty
+T -> entero | real | caracter
+C -> inicio S fin
+S -> id opasig E S | empty
+E -> id | num | num.num
+
+ANALIZAR LOS PRIMEROS DE LA SECCIÓN 1.3
+
+PRIMEROS(P) = {PRIMEROS(V),PRIMEROS(C)}
+PRIMEROS(V) = {id, empty}
+PRIMEROS(T) = {entero, real, caracter}
+PRIMEROS(C) = {inicio}
+PRIMEROS(S) = {id, empty}
+PRIMEROS(E) = {id, num, num.num}
+
+procedure P
+begin
+	if preanalisis IN {'id','inicio'} then
+		begin
+			// P -> V C
+			V ()
+			C ()
+		end
+	else
+			error 'El programa debe empezar con la declaracion de una variable
+				o con la palabra reservada "inicio"'
+end
+
+procedure V 
+begin
+	if preanalisis IN {'id'} then
+		begin
+			// V -> id : T V
+			emparejar ('id')
+			emparejar (':')
+			T ()
+			V ()
+		end
+	else 
+		begin 
+			// V -> empty 
+		end 
+end
+
+procedure T
+begin
+	if preanalisis = 'entero' then 
+		begin
+			// T -> entero
+			emparejar ('entero')
+		end 
+	else if preanalisis = 'real' then 
+		begin
+			// T -> real 
+			emparejar ('real')
+		end 
+	else if preanalisis = 'caracter' then 
+		begin 
+			// T -> caracter 
+			emparejar ('caracter')
+		end 
+	else 
+			error
+end
+
+procedure C
+begin
+	if preanalisis IN {'inicio'} then
+		begin
+			// C -> inicio S end 
+			emparejar ('inicio')
+			S ()
+			emparejar ('fin') 
+		end 
+	else 
+			error
+end
+
+procedure S
+begin
+	if preanalisis IN {'id'} then 
+		begin 
+			// S -> id opasig E S
+			emparejar ('id')
+			emparejar ('opasig')
+			E ()
+			S ()
+		end 
+	else 
+		begin 
+			// S -> empty
+		end 
+end
+
+procedure E
+begin
+	if preanalisis = 'id' then 
+		begin 
+			// E -> id 
+			emparejar ('id')
+		end 
+	else if preanalisis = 'num' then 
+		begin 
+			// E -> num
+			emparejar ('num')
+		end 
+	else if preanalisis = 'num.num' then 
+		begin 
+			// E -> num.num 
+			emparejar ('num.num')
+		end 
+	else 
+			error 
+end
+
+Procedure emparejar ( t : complex )
+begin
+	If preanalisis = t then
+			preanalisis := sigcomplex
+	Else
+			error ;
+end;
