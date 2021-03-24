@@ -117,16 +117,16 @@ public class SintacticoSemantico {
     // * * *   AQUI EMPIEZA  EL CODIGO DE LOS PROCEDURES    * * *
     
     // Autor: Cristian Gabriel Piña Rosales 18130588
-    // PRIMEROS(programa) = {PRIMEROS(declaraciones), PRIMEROS(declaracion_subprograma), 
+    // PRIMEROS(programa) = {PRIMEROS(declaraciones), PRIMEROS(declaracion_subprogramas), 
     //                       PRIMEROS(proposiciones_optativas), end}
     
     private void programa () { 
         if ( preAnalisis.equals ( "dim" ) || preAnalisis.equals ( "function" ) ||
-             preAnalisis.equals ( "id" ) || preAnalisis.equals ( "end" ) ||
-             preAnalisis.equals ( "call" ) || preAnalisis.equals ( "if" )  ||
-             preAnalisis.equals ( "do" ) ) {
+             preAnalisis.equals ( "sub" ) || preAnalisis.equals ( "id" )  || 
+             preAnalisis.equals ( "call" ) || preAnalisis.equals ( "if" )  || 
+             preAnalisis.equals ( "do" ) || preAnalisis.equals ( "end" ) ) {
             /* programa -> declaraciones
-                           declataciones_subprogramas
+                           declaraciones_subprogramas
                            proposiciones_optativas
                            end
             */
@@ -246,24 +246,22 @@ public class SintacticoSemantico {
     
     //--------------------------------------------------------------------------
     // Autor: Cristian Gabriel Piña Rosales 18130588
-    // PRIMEROS(declaraciones_funcion) = {function}
+    // PRIMEROS(declaracion_funcion) = {function}
     
     private void declaracion_funcion () {
         if ( preAnalisis.equals ( "function" ) ) {
-            /* declaracion_funcion -> function id ( argumentos ) as
-                                      tipo proposiciones_optativas end function */
+            /* declaracion_funcion -> function id argumentos as tipo 
+                                      proposiciones_optativas end function */
             emparejar ( "function" );
             emparejar ( "id" );
-           // emparejar ( "(" );
             argumentos ();
-           // emparejar ( ")" );
             emparejar ( "as" );
             tipo ();
             proposiciones_optativas ();
             emparejar ( "end" );
             emparejar ( "function" );
         } else {
-            error ( "[declaracion_funcion] Se esperaba una funcion "
+            error ( "[declaracion_funcion] Se esperaba una funcion. "
                     + "No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
@@ -284,7 +282,7 @@ public class SintacticoSemantico {
             emparejar ( "end" );
             emparejar ( "sub" );
         } else {
-            error ( "[declaracion_subrutina] Se esperaba una subrutina valida "
+            error ( "[declaracion_subrutina] Se esperaba una subrutina valida. "
                    + "No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
@@ -315,7 +313,7 @@ public class SintacticoSemantico {
             proposicion ();
             proposiciones_optativas ();
         } /* else {
-            // proposiciones_optativias -> empry
+            // proposiciones_optativias -> empty
         } */
     }
     
@@ -346,14 +344,14 @@ public class SintacticoSemantico {
             emparejar ( "end" );
             emparejar ( "if" );
         } else if ( preAnalisis.equals ( "do" ) ) {
-            // proposiccion -> do while condicion proposiciones_optativas loop
+            // proposicion -> do while condicion proposiciones_optativas loop
             emparejar ( "do" );
             emparejar ( "while" );
             condicion ();
             proposiciones_optativas ();
             emparejar ( "loop" );
         } else {
-            error ( "[proposicion] Se esperaba una proposicion valida "
+            error ( "[proposicion] Se esperaba una proposicion valida. "
                    + "No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
@@ -378,19 +376,16 @@ public class SintacticoSemantico {
     // PRIMEROS(lista_expresiones) = {PRIMEROS(expresion), empty}
     
     private void lista_expresiones () {
-        if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "literal" ) ||
-             preAnalisis.equals ( "num" ) || preAnalisis.equals ( "num.num" ) ||
-             preAnalisis.equals ( "(" ) ) {
+        if ( preAnalisis.equals ( "id" )  || preAnalisis.equals ( "num" ) || 
+             preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) || 
+             preAnalisis.equals ( "literal" ) ) {
             // lista_expresiones -> expresion lista_expresiones' 
             expresion ();
             lista_expresiones_prima ();
-         
         } /* else {
             // lista_expresiones -> empty
         } */
     }
-    
-    
     
     //--------------------------------------------------------------------------
     // Autor: Sergio Alejandro Chairez Garcia 17130772
@@ -420,9 +415,9 @@ public class SintacticoSemantico {
             emparejar ( "oprel" );
             expresion ();
         } else {
-            error("[condicion] Se esperaba el nombre de un identificador, "
+            error ( "[condicion] Se esperaba el nombre de un identificador, "
                     + "una constante numérica, o paréntesis o una literal "
-                    + "seguido de un operador relacional "
+                    + "seguido de un operador relacional. "
                     + "No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
@@ -441,8 +436,8 @@ public class SintacticoSemantico {
             // expresion -> literal
             emparejar ( "literal" );
         } else {
-            error ( "{expresion} Se esperaba el nombre de un identificador, "
-                    + "una constante numérica, o paréntesis o una literal" 
+            error ( "[expresion] Se esperaba el nombre de un identificador, "
+                    + "una constante numérica, o paréntesis o una literal. " 
                     + "No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
@@ -473,14 +468,14 @@ public class SintacticoSemantico {
             factor ();
             termino_prima ();
         } else {
-            error ( "[termino] Se esperaba un termino "
+            error ( "[termino] Se esperaba un termino. "
                     + "No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
     
     //--------------------------------------------------------------------------
     // Autor: Sergio Alejandro Chairez Garcia 17130772
-    // PRIMEROS(termino') = {opmult}
+    // PRIMEROS(termino') = {opmult, empty}
     
     private void termino_prima () {
         if ( preAnalisis.equals ( "opmult" ) ) {
@@ -517,8 +512,8 @@ public class SintacticoSemantico {
             expresion ();
             emparejar ( ")" );
         } else {
-            error ( "{factor} Se esperaba el nombre de un identificador, "
-                    + "una constante numérica, o paréntesis"
+            error ( "[factor] Se esperaba el nombre de un identificador, "
+                    + "una constante numérica, o paréntesis. "
                     + "No. de Linea " + cmp.be.preAnalisis.numLinea);
         }
     }
@@ -534,7 +529,7 @@ public class SintacticoSemantico {
             lista_expresiones ();
             emparejar ( ")" );
         } /* else {
-            // factor -> empty
+            // factor' -> empty
         } */
     }
 }
