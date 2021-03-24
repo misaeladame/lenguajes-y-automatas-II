@@ -117,10 +117,14 @@ public class SintacticoSemantico {
     // * * *   AQUI EMPIEZA  EL CODIGO DE LOS PROCEDURES    * * *
     
     // Autor: Cristian Gabriel Piña Rosales 18130588
-    // PRIMEROS(programa) = {PRIMEROS(declaraciones)}
+    // PRIMEROS(programa) = {PRIMEROS(declaraciones), PRIMEROS(declaracion_subprograma), 
+    //                       PRIMEROS(proposiciones_optativas), end}
     
-    private void programa () {
-        if ( preAnalisis.equals ( "dim" ) ) {
+    private void programa () { 
+        if ( preAnalisis.equals ( "dim" ) || preAnalisis.equals ( "function" ) ||
+             preAnalisis.equals ( "id" ) || preAnalisis.equals ( "end" ) ||
+             preAnalisis.equals ( "call" ) || preAnalisis.equals ( "if" )  ||
+             preAnalisis.equals ( "do" ) ) {
             /* programa -> declaraciones
                            declataciones_subprogramas
                            proposiciones_optativas
@@ -207,7 +211,7 @@ public class SintacticoSemantico {
     
     //--------------------------------------------------------------------------
     // Autor: Cristian Gabriel Piña Rosales 18130588
-    // PRIMEROS(declaraciones_subprogramas) = {PRIMEROS(declaraciones_subprograma), 
+    // PRIMEROS(declaraciones_subprogramas) = {PRIMEROS(declaracion_subprograma), 
     //                                         empty}
     
     private void declaraciones_subprogramas () {
@@ -223,8 +227,8 @@ public class SintacticoSemantico {
     
     //--------------------------------------------------------------------------
     // Autor: Cristian Gabriel Piña Rosales 18130588
-    // PRIMEROS(declaraciones_subprograma) = {PRIMEROS(declaraciones_funcion), 
-    //                                        PRIMEROS(declaraciones_subrutina)}
+    // PRIMEROS(declaracion_subprograma) = {PRIMEROS(declaracion_funcion), 
+    //                                      PRIMEROS(declaracion_subrutina)}
     
     private void declaracion_subprograma () {
         if ( preAnalisis.equals ( "function" ) ) {
@@ -245,14 +249,14 @@ public class SintacticoSemantico {
     // PRIMEROS(declaraciones_funcion) = {function}
     
     private void declaracion_funcion () {
-        if ( preAnalisis.equals ( "function") ) {
+        if ( preAnalisis.equals ( "function" ) ) {
             /* declaracion_funcion -> function id ( argumentos ) as
                                       tipo proposiciones_optativas end function */
             emparejar ( "function" );
             emparejar ( "id" );
-            emparejar ( "(" );
+           // emparejar ( "(" );
             argumentos ();
-            emparejar ( ")" );
+           // emparejar ( ")" );
             emparejar ( "as" );
             tipo ();
             proposiciones_optativas ();
@@ -270,7 +274,7 @@ public class SintacticoSemantico {
     
     private void declaracion_subrutina () {
         if ( preAnalisis.equals ( "sub" ) ) {
-            /* declaracion_subrutina -> sub id argumentps proposiciones_optativas
+            /* declaracion_subrutina -> sub id argumentos proposiciones_optativas
                                         end sub
             */
             emparejar ( "sub" );
@@ -305,7 +309,8 @@ public class SintacticoSemantico {
     // PRIMEROS(proposiciones_optativas) = {PRIMEROS(proposicion), empty}
     
     private void proposiciones_optativas () {
-        if ( preAnalisis.equals ( "id" ) )  {
+        if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "call" ) ||
+             preAnalisis.equals ( "if" ) || preAnalisis.equals ( "do" ))  {
             // proposiciones_optativas -> proposicion proposiciones_optativas
             proposicion ();
             proposiciones_optativas ();
@@ -373,7 +378,9 @@ public class SintacticoSemantico {
     // PRIMEROS(lista_expresiones) = {PRIMEROS(expresion), empty}
     
     private void lista_expresiones () {
-        if ( preAnalisis.equals ( "id" ) ) {
+        if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "literal" ) ||
+             preAnalisis.equals ( "num" ) || preAnalisis.equals ( "num.num" ) ||
+             preAnalisis.equals ( "(" ) ) {
             // lista_expresiones -> expresion lista_expresiones' 
             expresion ();
             lista_expresiones_prima ();
@@ -405,12 +412,14 @@ public class SintacticoSemantico {
     // PRIMEROS(condicion) = {PRIMEROS(expresion)}
     
     private void condicion () {
-        if( preAnalisis.equals ( "id" ) ) {
+        if ( preAnalisis.equals ( "id" )  || preAnalisis.equals ( "num" ) || 
+             preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) || 
+             preAnalisis.equals ( "literal" ) ) {
             /* condicion -> expresion oprel expresion */
             expresion ();
             emparejar ( "oprel" );
             expresion ();
-        } else{
+        } else {
             error("[condicion] Se esperaba el nombre de un identificador, "
                     + "una constante numérica, o paréntesis o una literal "
                     + "seguido de un operador relacional "
@@ -423,7 +432,8 @@ public class SintacticoSemantico {
     // PRIMEROS(expresion) = {PRIMEROS(termino), literal}
     
     private void expresion () {
-        if ( preAnalisis.equals ( "id" ) ){
+        if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "num" ) ||
+             preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) ) {
             /* expresion -> termino expresion' */
             termino ();
             expresion_prima ();
@@ -457,7 +467,8 @@ public class SintacticoSemantico {
     // PRIMEROS(termino) = {PRIMEROS(factor)}
     
     private void termino () {
-        if ( preAnalisis.equals ( "id" ) ) {
+        if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "num" ) ||
+             preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" )) {
             // termino -> factor termino'
             factor ();
             termino_prima ();
@@ -486,11 +497,11 @@ public class SintacticoSemantico {
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(factor) = {id, num, num.num, (}
     
-    private void factor(){
+    private void factor () {
         if ( preAnalisis.equals ( "id" ) ) {
             // factor -> id factor'
             emparejar ( "id" );
-            factor_prima ( );
+            factor_prima ();
         }
          else if ( preAnalisis.equals ( "num" ) ) {
             // factor -> num
