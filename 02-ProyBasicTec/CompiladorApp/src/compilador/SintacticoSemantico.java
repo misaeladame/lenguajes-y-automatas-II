@@ -128,7 +128,7 @@ public class SintacticoSemantico {
             */
             declaraciones ();
             declaraciones_subprogramas ();
-            declaraciones_optativas ();
+            proposiciones_optativas ();
             emparejar ( "end" );
         } else {
             error ( "[programa] Programa debe de iniciar con una declaracion "
@@ -147,9 +147,9 @@ public class SintacticoSemantico {
             emparejar ( "dim" );
             lista_declaraciones ();
             declaraciones ();
-        } /*else {
+        } /* else {
             // declaraciones -> empty
-        }*/
+        } */
     }
     
     //--------------------------------------------------------------------------
@@ -179,9 +179,9 @@ public class SintacticoSemantico {
             // lista_declaraciones' -> , lista_declaraciones
             emparejar ( "," );
             lista_declaraciones ();
-        } /*else {
+        } /* else {
             // listas_declaraciones' -> empty
-        }*/
+        } */
     }
     
     //--------------------------------------------------------------------------
@@ -216,10 +216,9 @@ public class SintacticoSemantico {
             //                               declaraciones_subprogramas
             declaracion_subprograma ();
             declaraciones_subprogramas ();
-        }
-        /*else{
+        } /* else {
             // declaraciones_subprogramas -> empty
-        }*/
+        } */
     }
     
     //--------------------------------------------------------------------------
@@ -245,10 +244,10 @@ public class SintacticoSemantico {
     // Autor: Cristian Gabriel Piña Rosales 18130588
     // PRIMEROS(declaraciones_funcion) = {function}
     
-    private void declaracion_funcion(){
+    private void declaracion_funcion () {
         if ( preAnalisis.equals ( "function") ) {
-            /*declaracion_funcion -> function id ( argumentos ) as
-                as tipo proposiciones_optativas end function*/
+            /* declaracion_funcion -> function id ( argumentos ) as
+                                      tipo proposiciones_optativas end function */
             emparejar ( "function" );
             emparejar ( "id" );
             emparejar ( "(" );
@@ -259,15 +258,274 @@ public class SintacticoSemantico {
             proposiciones_optativas ();
             emparejar ( "end" );
             emparejar ( "function" );
-        } else{
+        } else {
             error ( "[declaracion_funcion] Se esperaba una funcion "
                     + "No. de Linea " + cmp.be.preAnalisis.numLinea );
         }
     }
     
     //--------------------------------------------------------------------------
-
+    // Autor: Jose Misael Adame Sandoval 18131209
+    // PRIMEROS(declaracion_subrutina) = {sub}
     
+    private void declaracion_subrutina () {
+        if ( preAnalisis.equals ( "sub" ) ) {
+            /* declaracion_subrutina -> sub id argumentps proposiciones_optativas
+                                        end sub
+            */
+            emparejar ( "sub" );
+            emparejar ( "id" );
+            argumentos ();
+            proposiciones_optativas ();
+            emparejar ( "end" );
+            emparejar ( "sub" );
+        } else {
+            error ( "[declaracion_subrutina] Se esperaba una subrutina valida "
+                   + "No. de Linea " + cmp.be.preAnalisis.numLinea );
+        }
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Jose Misael Adame Sandoval 18131209
+    // PRIMEROS(argumentos) = {(, empty}
+    
+    private void argumentos () {
+        if ( preAnalisis.equals ( "(" ) ) {
+            // argumentos -> ( lista_declaraciones ) 
+            emparejar ( "(" );
+            lista_declaraciones ();
+            emparejar ( ")" );
+        } /* else {
+            // argumentos -> empty
+        } */
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Jose Misael Adame Sandoval 18131209
+    // PRIMEROS(proposiciones_optativas) = {PRIMEROS(proposicion), empty}
+    
+    private void proposiciones_optativas () {
+        if ( preAnalisis.equals ( "id" ) )  {
+            // proposiciones_optativas -> proposicion proposiciones_optativas
+            proposicion ();
+            proposiciones_optativas ();
+        } /* else {
+            // proposiciones_optativias -> empry
+        } */
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Jose Misael Adame Sandoval 18131209
+    // PRIMEROS(proposicion) = {id, call, if, do}
+    
+    private void proposicion () {
+        if ( preAnalisis.equals ( "id" ) ) {
+            // proposicion -> id opasig expresion
+            emparejar ( "id" );
+            emparejar ( "opasig" );
+            expresion ();
+        } else if ( preAnalisis.equals( "call" ) ) {
+            // proposicion -> call id proposicion'
+            emparejar ( "call" );
+            emparejar ( "id" );
+            proposicion_prima ();
+        } else if ( preAnalisis.equals ( "if" ) ) {
+            // proposicion -> if condicion then proposicicones_optativas else 
+            //                proposiciones_optativas end if
+            emparejar ( "if" );
+            condicion ();
+            emparejar ( "then" );
+            proposiciones_optativas ();
+            emparejar ( "else" );
+            proposiciones_optativas ();
+            emparejar ( "end" );
+            emparejar ( "if" );
+        } else if ( preAnalisis.equals ( "do" ) ) {
+            // proposiccion -> do while condicion proposiciones_optativas loop
+            emparejar ( "do" );
+            emparejar ( "while" );
+            condicion ();
+            proposiciones_optativas ();
+            emparejar ( "loop" );
+        } else {
+            error ( "[proposicion] Se esperaba una proposicion valida "
+                   + "No. de Linea " + cmp.be.preAnalisis.numLinea );
+        }
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Jose Misael Adame Sandoval 18131209
+    // PRIMEROS(proposicion’) = {(, empty}
+    
+    private void proposicion_prima () {
+        if ( preAnalisis.equals ( "(" ) ) {
+            // proposicion' -> ( lista_expresiones ) 
+            emparejar ( "(" );
+            lista_expresiones ();
+            emparejar ( ")" );
+        } /* else {
+            // proposicion' -> empty
+        } */
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Jose Misael Adame Sandoval 18131209
+    // PRIMEROS(lista_expresiones) = {PRIMEROS(expresion), empty}
+    
+    private void lista_expresiones () {
+        if ( preAnalisis.equals ( "id" ) ) {
+            // lista_expresiones -> expresion lista_expresiones' 
+            expresion ();
+            lista_expresiones_prima ();
+         
+        } /* else {
+            // lista_expresiones -> empty
+        } */
+    }
+    
+    
+    
+    //--------------------------------------------------------------------------
+    // Autor: Sergio Alejandro Chairez Garcia 17130772
+    // PRIMEROS(lista_expresiones') = {,, empty}
+    
+     private void lista_expresiones_prima () {
+        if ( preAnalisis.equals ( "," ) ) {
+            /*lista_expresiones' -> , expresion lista_expresiones' */
+            emparejar ( "," );
+            expresion ();
+            lista_expresiones_prima ();
+        } /* else { 
+            // lista_expresiones' -> empty
+        } */
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Sergio Alejandro Chairez Garcia 17130772
+    // PRIMEROS(condicion) = {PRIMEROS(expresion)}
+    
+    private void condicion () {
+        if( preAnalisis.equals ( "id" ) ) {
+            /* condicion -> expresion oprel expresion */
+            expresion ();
+            emparejar ( "oprel" );
+            expresion ();
+        } else{
+            error("[condicion] Se esperaba el nombre de un identificador, "
+                    + "una constante numérica, o paréntesis o una literal "
+                    + "seguido de un operador relacional "
+                    + "No. de Linea " + cmp.be.preAnalisis.numLinea );
+        }
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Sergio Alejandro Chairez Garcia 17130772
+    // PRIMEROS(expresion) = {PRIMEROS(termino), literal}
+    
+    private void expresion () {
+        if ( preAnalisis.equals ( "id" ) ){
+            /* expresion -> termino expresion' */
+            termino ();
+            expresion_prima ();
+        } else if ( preAnalisis.equals ( "literal" ) ){
+            // expresion -> literal
+            emparejar ( "literal" );
+        } else {
+            error ( "{expresion} Se esperaba el nombre de un identificador, "
+                    + "una constante numérica, o paréntesis o una literal" 
+                    + "No. de Linea " + cmp.be.preAnalisis.numLinea );
+        }
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Sergio Alejandro Chairez Garcia 17130772
+    // PRIMEROS(expresion') = {opsuma, empty}
+    
+    private void expresion_prima () {
+        if ( preAnalisis.equals ( "opsuma" ) ) {
+            /* expresion' -> opsuma termino expresiom' */
+            emparejar ( "opsuma" );
+            termino ();
+            expresion_prima ();
+        } /* else { 
+            // expresion' -> empty
+        } */
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Sergio Alejandro Chairez Garcia 17130772
+    // PRIMEROS(termino) = {PRIMEROS(factor)}
+    
+    private void termino () {
+        if ( preAnalisis.equals ( "id" ) ) {
+            // termino -> factor termino'
+            factor ();
+            termino_prima ();
+        } else {
+            error ( "[termino] Se esperaba un termino "
+                    + "No. de Linea " + cmp.be.preAnalisis.numLinea );
+        }
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Sergio Alejandro Chairez Garcia 17130772
+    // PRIMEROS(termino') = {opmult}
+    
+    private void termino_prima () {
+        if ( preAnalisis.equals ( "opmult" ) ) {
+            /* termino' -> opmult factor termino' */
+            emparejar ( "opmult" );
+            factor ();
+            termino_prima ();
+        } /* else {
+            // termino' -> empty
+        } */
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Sergio Alejandro Chairez Garcia 17130772
+    // PRIMEROS(factor) = {id, num, num.num, (}
+    
+    private void factor(){
+        if ( preAnalisis.equals ( "id" ) ) {
+            // factor -> id factor'
+            emparejar ( "id" );
+            factor_prima ( );
+        }
+         else if ( preAnalisis.equals ( "num" ) ) {
+            // factor -> num
+            emparejar ( "num" );
+        }
+        else if ( preAnalisis.equals ( "num.num" ) ) {
+            // factor -> num.num
+            emparejar ( "num.num" );
+        }
+        else if ( preAnalisis.equals ( "(" ) ){
+            // factor -> ( expresion )
+            emparejar ( "(" );
+            expresion ();
+            emparejar ( ")" );
+        } else {
+            error ( "{factor} Se esperaba el nombre de un identificador, "
+                    + "una constante numérica, o paréntesis"
+                    + "No. de Linea " + cmp.be.preAnalisis.numLinea);
+        }
+    }
+    
+    //--------------------------------------------------------------------------
+    // Autor: Sergio Alejandro Chairez Garcia 17130772
+    // PRIMEROS(factor') = {(, empty}
+    
+    private void factor_prima () {
+        if ( preAnalisis.equals ( "(" ) ) {
+            /* factor' -> ( lista_expresiones ) */
+            emparejar ( "(" );
+            lista_expresiones ();
+            emparejar ( ")" );
+        } /* else {
+            // factor -> empty
+        } */
+    }
 }
 
 //------------------------------------------------------------------------------
