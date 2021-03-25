@@ -26,6 +26,30 @@
  *:                                 ocurrio el error.
  *: 08/Sep/2015 FGil                -Se dejo lista para iniciar un nuevo analizador
  *:                                 sintactico.
+ *: 22/Mar/2021 Cristian Piña       Se agregaron los Procedures de:
+ *:                                 programa ()
+ *:                                 declaraciones ()
+ *:                                 lista_declaraciones ()
+ *:                                 lista_declaraciones_prima ()
+ *:                                 tipo ()
+ *:                                 declaraciones_subprogramas ()
+ *:                                 declaracion_funcion ()
+ *: 23/Mar/2021 Misael Adame        Se agregaron los Procedures de:
+ *:                                 declaracion_subrutina ()
+ *:                                 argumentos ()
+ *:                                 proposiciones_optativas ()
+ *:                                 proposicion ()
+ *:                                 proposicion_prima ()
+ *:                                 lista_expresiones ()
+ *: 23/Mar/2021 Sergio Chairez      Se agregaron los Procedures de:
+ *:                                 lista_expresiones_prima ()
+ *:                                 condicion ()
+ *:                                 expresion ()
+ *:                                 expresion_prima ()
+ *:                                 termino ()
+ *:                                 termino_prima ()
+ *:                                 factor ()
+ *:                                 factor_prima ()
  *:----------------------------------------------------------------------------
  */
 package compilador;
