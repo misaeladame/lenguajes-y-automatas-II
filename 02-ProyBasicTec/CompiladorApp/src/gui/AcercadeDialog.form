@@ -90,7 +90,7 @@
             <Property name="columns" type="int" value="20"/>
             <Property name="lineWrap" type="boolean" value="true"/>
             <Property name="rows" type="int" value="5"/>
-            <Property name="text" type="java.lang.String" value="             TECNOLOGICO NACIONAL DE MEXICO&#xa;          INSTITUTO TECNOLOGICO DE LA LAGUNA&#xa;     INGENIERIA EN SISTEMAS COMPUTACIONALES&#xa;               &quot;LENGUAJES Y AUTOMATAS II&quot;&#xa;&#xa;             Compilador de Lenguaje ____&#xa;                         Ver. 1.0.0&#xa;&#xa;                  EQUIPO DE DESARROLLO:&#xa;&#x9;&#xa;      18131209  Jos&#xe9; Misael Adame Sandoval&#xa;      17130772  Sergio Alejandro Ch&#xe1;irez Garc&#xed;a&#xa;      18130588  Cristian Gabriel Pi&#xf1;a Rosales                    "/>
+            <Property name="text" type="java.lang.String" value="             TECNOLOGICO NACIONAL DE MEXICO&#xa;          INSTITUTO TECNOLOGICO DE LA LAGUNA&#xa;     INGENIERIA EN SISTEMAS COMPUTACIONALES&#xa;               &quot;LENGUAJES Y AUTOMATAS II&quot;&#xa;&#xa;             Compilador de Lenguaje BasicTec&#xa;                         Ver. 1.0.0&#xa;&#xa;                  EQUIPO DE DESARROLLO:&#xa;&#x9;&#xa;      18131209  Jos&#xe9; Misael Adame Sandoval&#xa;      17130772  Sergio Alejandro Ch&#xe1;irez Garc&#xed;a&#xa;      18130588  Cristian Gabriel Pi&#xf1;a Rosales                    "/>
           </Properties>
         </Component>
       </SubComponents>
