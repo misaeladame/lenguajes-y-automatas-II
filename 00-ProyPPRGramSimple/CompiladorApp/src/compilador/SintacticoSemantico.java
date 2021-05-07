@@ -26,6 +26,7 @@
  *:                                 ocurrio el error.
  *: 08/Sep/2015 FGil                -Se dejo lista para iniciar un nuevo analizador
  *:                                 sintactico.
+ *: 06/May/2021 Misael Adame        -Se implementa los esquemas de traducción 
  *:-----------------------------------------------------------------------------
  */
 package compilador;
@@ -114,8 +115,14 @@ public class SintacticoSemantico {
     //--------------------------------------------------------------------------
     //  *  *   *   *    PEGAR AQUI EL CODIGO DE LOS PROCEDURES  *  *  *  *
     //--------------------------------------------------------------------------
-
-    private void P () {
+    // PRIMEROS ( P ) = { PRIMEROS ( V ), PRIMEROS ( C ) }
+    // PRIMEROS ( P ) = { id, inicio }     
+        
+    private void P ( Atributos P ) {
+        
+        Atributos V = new Atributos ();
+        Atributos C = new Atributos ();
+        
         if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "inicio" ) ) {
             // P -> V C
             V ();
@@ -129,8 +136,14 @@ public class SintacticoSemantico {
     }
     
     //------------------------------------------------------------------------------
+    // PRIMEROS ( V ) = { id, empty }
     
-    private void V () {
+    private void V ( Atributos V ) {
+        
+        Linea_BE id = new Linea_BE ();
+        Atributos T = new Atributos ();
+        Atributos V1 = new Atributos ();
+        
         if ( preAnalisis.equals ( "id" ) ) {
             // V -> id : TV
             emparejar ( "id" );
@@ -144,8 +157,9 @@ public class SintacticoSemantico {
     }
     
     //------------------------------------------------------------------------------
+    // PRIMEROS ( T ) = { entero, real, caracter }
     
-    private void T () {
+    private void T ( Atributos T ) {
         if ( preAnalisis.equals ( "entero" ) ) {
             // T -> entero
             emparejar ( "entero" );
@@ -162,8 +176,12 @@ public class SintacticoSemantico {
     }
     
     //------------------------------------------------------------------------------
+    // PRIMEROS ( C ) = { inicio }
     
-    private void C () {
+    private void C ( Atributos C ) {
+        
+        Atributos S = new Atributos ();
+        
         if ( preAnalisis.equals ( "inicio" ) ) {
             // C -> inicio S end 
             emparejar ( "inicio" );
@@ -176,8 +194,14 @@ public class SintacticoSemantico {
     }
     
     //------------------------------------------------------------------------------
+    // PRIMEROS ( S ) = { id, empty }
     
-    private void S () {
+    private void S ( Atributos S ) {
+        
+        Linea_BE id = new Linea_BE ();
+        Atributos E = new Atributos ();
+        Atributos S1 = new Atributos ();
+        
         if ( preAnalisis.equals ( "id" ) ) {
             // S -> id opasig E S
             emparejar ( "id" );
@@ -190,8 +214,12 @@ public class SintacticoSemantico {
     }
     
     //------------------------------------------------------------------------------
+    // PRIMEROS ( E ) = { id, num, num.num, literal }
     
-    private void E () {
+    private void E ( Atributos E ) {
+        
+        Linea_BE id = new Linea_BE ();
+        
         if ( preAnalisis.equals ( "id" ) ) {
             // E -> id
             emparejar ( "id" );
@@ -201,6 +229,9 @@ public class SintacticoSemantico {
         } else if ( preAnalisis.equals ( "num.num" ) ) {
             // E -> num.num
             emparejar ( "num.num" );
+        } else if ( preAnalisis.equals ( "literal" ) ) {
+            // E -> literal
+            emparejar ( "literal" );
         } else {
             error ("[E]: Expresion invalida, debe iniciar con un identificador o " +
                    "con constante numerica. No. de Linea " + cmp.be.preAnalisis.numLinea );
