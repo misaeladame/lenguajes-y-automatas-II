@@ -34,6 +34,10 @@ package compilador;
 import javax.swing.JOptionPane;
 
 public class SintacticoSemantico {
+    
+    public static final String VACIO      = "vacio";
+    public static final String ERROR_TIPO = "error_tipo";
+    public static final String NIL        = ""; 
 
     private Compilador cmp;
     private boolean    analizarSemantica = false;
@@ -125,8 +129,17 @@ public class SintacticoSemantico {
         
         if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "inicio" ) ) {
             // P -> V C
-            V ();
-            C ();
+            V ( V );
+            C ( C );
+            // Accion semantica 1
+            if ( analizarSemantica ) {
+                P.tipo = ( V.tipo.equals ( VACIO ) && C.tipo.equals ( VACIO ) ) ? VACIO : ERROR_TIPO;
+                if ( P.tipo.equals ( ERROR_TIPO ) ) {
+                    cmp.me.error ( Compilador.ERR_SEMANTICO, 
+                        "[P] Programa con errores de tipo en la declaracion de variables o en sentencias" );
+                }
+            }
+            // Fin accion semantica 1
         } else {
             error ( "[P] Programa debe iniciar con una declaración de variable o "
                     + "con la palabra reservada inicio. "
@@ -145,21 +158,43 @@ public class SintacticoSemantico {
         Atributos V1 = new Atributos ();
         
         if ( preAnalisis.equals ( "id" ) ) {
-            // V -> id : TV
+            // V -> id : T V
+            id = cmp.be.preAnalisis;  // Salvamos los atributos de id
             emparejar ( "id" );
             emparejar ( ":" );
-            T ();
-            V ();
+            T ( T );
+            // Accion semantica 6 
+            if ( analizarSemantica ) {
+                
+            }
+            // Fin accion semantica 6
+            V ( V1 );
+            // Accion semantica 7
+            if ( analizarSemantica ) {
+                if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) ) {
+                    cmp.ts.anadeTipo ( id.entrada, T.tipo );
+                    V.tipoaux = VACIO;
+                } else {
+                    V.tipoaux = ERROR_TIPO;
+                    cmp.me.error ( Compilador.ERR_SEMANTICO,
+                        "[V] Error identificador ya declarado : " + id.lexema );
+                }
+            }
+            // Fin accion semantica 7
         } 
-        /*else {
+        else {
             // V -> empty
-        }*/
+            if ( analizarSemantica ) 
+                V.tipo = VACIO;
+        }
     }
     
     //------------------------------------------------------------------------------
     // PRIMEROS ( T ) = { entero, real, caracter }
     
     private void T ( Atributos T ) {
+        // No requiere variables locales
+        
         if ( preAnalisis.equals ( "entero" ) ) {
             // T -> entero
             emparejar ( "entero" );
