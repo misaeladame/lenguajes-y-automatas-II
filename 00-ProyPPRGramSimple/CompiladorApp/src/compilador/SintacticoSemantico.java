@@ -63,7 +63,7 @@ public class SintacticoSemantico {
         preAnalisis = cmp.be.preAnalisis.complex;
 
         // * * *   INVOCAR AQUI EL PROCEDURE DEL SIMBOLO INICIAL   * * *
-        P ();
+        P ( );
     }
 
     //--------------------------------------------------------------------------
@@ -165,12 +165,6 @@ public class SintacticoSemantico {
             T ( T );
             // Accion semantica 6 
             if ( analizarSemantica ) {
-                
-            }
-            // Fin accion semantica 6
-            V ( V1 );
-            // Accion semantica 7
-            if ( analizarSemantica ) {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) ) {
                     cmp.ts.anadeTipo ( id.entrada, T.tipo );
                     V.tipoaux = VACIO;
@@ -180,12 +174,24 @@ public class SintacticoSemantico {
                         "[V] Error identificador ya declarado : " + id.lexema );
                 }
             }
+            // Fin accion semantica 6
+            V ( V1 );
+            // Accion semantica 7
+            if ( analizarSemantica ) {
+                V.tipo = ( V.tipoaux.equals ( VACIO ) && V1.tipo.equals ( VACIO ) ) ? VACIO : ERROR_TIPO;
+                if ( V.tipo.equals ( ERROR_TIPO ) ) {
+                    cmp.me.error ( Compilador.ERR_SEMANTICO,
+                            "[V] Error de tipos en la seccion de declaraciones de variables.");
+                }
+            }
             // Fin accion semantica 7
         } 
         else {
             // V -> empty
+            // Accion semantica 2
             if ( analizarSemantica ) 
                 V.tipo = VACIO;
+            // Fin accion semantica 2
         }
     }
     
@@ -198,12 +204,24 @@ public class SintacticoSemantico {
         if ( preAnalisis.equals ( "entero" ) ) {
             // T -> entero
             emparejar ( "entero" );
+            // Accion semantica 3
+            if ( analizarSemantica )
+                T.tipo = "entero";
+            // Fin Accion semantica 3
         } else if ( preAnalisis.equals ( "real" ) ) {
             // T -> real
             emparejar ( "real" );
+            // Accion semantica 4
+            if ( analizarSemantica )
+                T.tipo = "real";
+            // Fin Accion semantica 4
         } else if ( preAnalisis.equals ( "caracter" ) ) {
             // T -> caracter 
             emparejar ( "caracter" );
+            // Accion semantica 5
+            if ( analizarSemantica )
+                T.tipo = "caracter";
+            // Fin Accion semantica 5
         } else {
             error ("[T]: Se esperaba un tipo de dato: entero, real o caracter. No. de Línea " 
                     + cmp.be.preAnalisis.numLinea );
@@ -220,8 +238,12 @@ public class SintacticoSemantico {
         if ( preAnalisis.equals ( "inicio" ) ) {
             // C -> inicio S end 
             emparejar ( "inicio" );
-            S ();
+            S ( S );
             emparejar ( "fin" );
+            // Accion semantica 8
+            if ( analizarSemantica )
+                C.tipo = S.tipo;
+            // Fin Accion semantica 8
         } else {
             error ("[C]: El cuerpo del programa debe comenzar con la palabra inicio. "
                     + "No. de Linea " + cmp.be.preAnalisis.numLinea );
@@ -239,12 +261,40 @@ public class SintacticoSemantico {
         
         if ( preAnalisis.equals ( "id" ) ) {
             // S -> id opasig E S
+            id = cmp.be.preAnalisis;  // Salvamos los atributos de id
             emparejar ( "id" );
             emparejar ( "opasig" );
-            E ();
-            S ();
+            E ( E );
+            // Accion semantica 14
+            if ( analizarSemantica ) {
+                if ( cmp.ts.buscaTipo ( id.entrada ).equals ( E.tipo ) ||
+                   ( cmp.ts.buscaTipo ( id.entrada ).equals ( "real" ) &&  
+                     cmp.ts.buscaTipo ( id.entrada ).equals ( "entero" ) ) ) {
+                    S.tipoaux = VACIO;
+                } else {
+                    S.tipoaux = ERROR_TIPO;
+                    cmp.me.error ( Compilador.ERR_SEMANTICO,
+                        "[S] Error, la asignacion no es compatible al tipo de dato "
+                               + "de la variable declarada" );
+                }
+            }
+            // Fin Accion semantica 14
+            S ( S1 ); 
+            // Accion semantica 15
+            if ( analizarSemantica ) {
+                S.tipo = ( S.tipoaux.equals ( VACIO ) && S1.tipo.equals ( VACIO ) ) ? VACIO : ERROR_TIPO;
+                if ( S.tipo.equals ( ERROR_TIPO ) ) {
+                    cmp.me.error ( Compilador.ERR_SEMANTICO,
+                            "[S] Error de tipos en la seccion de asignaciones de variables.");
+                }
+            }
+            // Fin accion semantica 15
         } else {
             // S -> empty
+            // Accion semantica 9
+            if ( analizarSemantica )
+                S.tipo = VACIO;
+            // Fin accion semantica 9
         }
     }
     
@@ -257,16 +307,33 @@ public class SintacticoSemantico {
         
         if ( preAnalisis.equals ( "id" ) ) {
             // E -> id
+            id = cmp.be.preAnalisis;  // Salvamos los atributos de id
             emparejar ( "id" );
+            // Accion semantica 10
+            if ( analizarSemantica )
+                E.tipo = cmp.ts.buscaTipo ( id.entrada );
+            // Fin accion semantica 10
         } else if ( preAnalisis.equals ( "num" ) ) {
             // E -> num
             emparejar ( "num" );
+            // Accion semantica 11
+            if ( analizarSemantica ) 
+                E.tipo = "entero";
+            // Fin accion semantica 11
         } else if ( preAnalisis.equals ( "num.num" ) ) {
             // E -> num.num
             emparejar ( "num.num" );
+            // Accion semantica 12
+            if ( analizarSemantica ) 
+                E.tipo = "real";
+            // Fin accion semantica 12
         } else if ( preAnalisis.equals ( "literal" ) ) {
             // E -> literal
             emparejar ( "literal" );
+            // Accion semantica 13
+            if ( analizarSemantica ) 
+                E.tipo = "caracter";
+            // Fin accion semantica 13
         } else {
             error ("[E]: Expresion invalida, debe iniciar con un identificador o " +
                    "con constante numerica. No. de Linea " + cmp.be.preAnalisis.numLinea );
