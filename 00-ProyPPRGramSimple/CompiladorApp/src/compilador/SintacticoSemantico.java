@@ -63,7 +63,7 @@ public class SintacticoSemantico {
         preAnalisis = cmp.be.preAnalisis.complex;
 
         // * * *   INVOCAR AQUI EL PROCEDURE DEL SIMBOLO INICIAL   * * *
-        P ( );
+        P ( new Atributos () );
     }
 
     //--------------------------------------------------------------------------
@@ -269,7 +269,7 @@ public class SintacticoSemantico {
             if ( analizarSemantica ) {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( E.tipo ) ||
                    ( cmp.ts.buscaTipo ( id.entrada ).equals ( "real" ) &&  
-                     cmp.ts.buscaTipo ( id.entrada ).equals ( "entero" ) ) ) {
+                      E.tipo.equals ( "entero" ) ) ) {
                     S.tipoaux = VACIO;
                 } else {
                     S.tipoaux = ERROR_TIPO;
