@@ -57,6 +57,10 @@ package compilador;
 import javax.swing.JOptionPane;
 
 public class SintacticoSemantico {
+    
+    public static final String VACIO      = "vacio";
+    public static final String ERROR_TIPO = "error_tipo";
+    public static final String NIL        = ""; 
 
     private Compilador cmp;
     private boolean    analizarSemantica = false;
@@ -82,7 +86,7 @@ public class SintacticoSemantico {
         preAnalisis = cmp.be.preAnalisis.complex;
 
         // * * *   INVOCAR AQUI EL PROCEDURE DEL SIMBOLO INICIAL   * * *7
-        programa ();
+        programa ( new Atributos () );
     }
 
     //--------------------------------------------------------------------------
@@ -144,20 +148,39 @@ public class SintacticoSemantico {
     // PRIMEROS(programa) = {PRIMEROS(declaraciones), PRIMEROS(declaracion_subprogramas), 
     //                       PRIMEROS(proposiciones_optativas), end}
     
-    private void programa () { 
+    private void programa ( Atributos programa ) { 
         if ( preAnalisis.equals ( "dim" ) || preAnalisis.equals ( "function" ) ||
              preAnalisis.equals ( "sub" ) || preAnalisis.equals ( "id" )  || 
              preAnalisis.equals ( "call" ) || preAnalisis.equals ( "if" )  || 
              preAnalisis.equals ( "do" ) || preAnalisis.equals ( "end" ) ) {
+            
+            Atributos declaraciones = new Atributos ();
+            // Atributos declaraciones_subprogramas = new Atributos ();
+            // Atributos proposiciones_optativas = new Atributos ();
+          
+            
             /* programa -> declaraciones
                            declaraciones_subprogramas
                            proposiciones_optativas
                            end
             */
-            declaraciones ();
-            declaraciones_subprogramas ();
-            proposiciones_optativas ();
+            declaraciones ( declaraciones );
+            // declaraciones_subprogramas ( declaraciones_subprogramas );
+            // proposiciones_optativas ( proposiciones_optativas );
             emparejar ( "end" );
+            
+            // Accion semantica 1
+            if ( analizarSemantica ) {
+               if ( declaraciones.tipo.equals ( VACIO ) ) {
+                   programa.tipo = VACIO;
+               } else {
+                   programa.tipo = ERROR_TIPO;
+                   cmp.me.error ( Compilador.ERR_SEMANTICO, 
+                        "[programa] Programa con errores de tipo en la declaracion de variables o en sentencias" );
+               }  
+            }
+            // Fin accion semantica 1
+            
         } else {
             error ( "[programa] Programa debe de iniciar con una declaracion "
                     + "de variable. "
@@ -169,28 +192,93 @@ public class SintacticoSemantico {
     // Autor: Cristian Gabriel Piña Rosales 18130588
     // PRIMEROS(declaraciones) = {dim, empty}
     
-    private void declaraciones () {
+    private void declaraciones ( Atributos declaraciones ) {
+        
+        Atributos lista_declaraciones = new Atributos ();
+        Atributos declaraciones1 = new Atributos ();
+        
         if ( preAnalisis.equals ( "dim" ) ) {
             // declaraciones -> dim lista_declaraciones declaraciones
             emparejar ( "dim" );
-            lista_declaraciones ();
-            declaraciones ();
-        } /* else {
+            lista_declaraciones ( lista_declaraciones );
+            
+            // Accion semantica 10
+            if ( analizarSemantica )
+                declaraciones.tipo = lista_declaraciones.tipo;
+            // Fin Accion semantica 10    
+           
+            declaraciones ( declaraciones1 );
+            
+            // Accion semantica 11
+            if ( analizarSemantica ) {
+                if ( lista_declaraciones.tipoaux.equals ( VACIO ) && 
+                     declaraciones1.tipo.equals ( VACIO ) )
+                    declaraciones.tipo = VACIO;
+                else {
+                    declaraciones.tipo = ERROR_TIPO;
+                    cmp.me.error ( Compilador.ERR_SEMANTICO,
+                            "[declaraciones] Error de tipos en la seccion de declaraciones de variables.");
+                }
+            }
+            // Fin Accion semantica 11
+            
+        } else {
             // declaraciones -> empty
-        } */
+            // Accion semantica 2
+            if ( analizarSemantica ) 
+                declaraciones.tipo = VACIO;
+            // Fin accion semantica 2
+        } 
     }
     
     //--------------------------------------------------------------------------
     // Autor: Cristian Gabriel Piña Rosales 18130588
     // PRIMEROS(lista_declaraciones) = {id}
     
-    private void lista_declaraciones () {
+    private void lista_declaraciones ( Atributos lista_declaraciones ) {
+        
+        Linea_BE id = new Linea_BE ();
+        Atributos tipo = new Atributos ();
+        Atributos lista_declaraciones_prima = new Atributos ();
+        
         if ( preAnalisis.equals ( "id" ) ) {
             // lista_declaraciones -> id as tipo lista_declaraciones'
+            id = cmp.be.preAnalisis;  // Salvamos los atributos de id
             emparejar ( "id" );
             emparejar ( "as" );
-            tipo ();
-            lista_declaraciones_prima ();
+            tipo ( tipo );
+            
+            // Accion semantica 7
+            if ( analizarSemantica ) {
+                if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) ) {
+                    cmp.ts.anadeTipo ( id.entrada, tipo.tipo );
+                    lista_declaraciones.tipoaux = VACIO;
+                    lista_declaraciones_prima.tipoaux = VACIO;
+                } else {
+                    lista_declaraciones.tipoaux = ERROR_TIPO;
+                    lista_declaraciones_prima.tipoaux = ERROR_TIPO;
+                    cmp.me.error ( Compilador.ERR_SEMANTICO,
+                        "[lista_declaraciones] Error identificador ya declarado : " + id.lexema );
+                }
+            }
+            // Fin accion semantica 7
+            
+            lista_declaraciones_prima ( lista_declaraciones_prima );
+        
+            // Accion semantica 8
+            if ( analizarSemantica ) {
+                if ( lista_declaraciones.tipoaux.equals ( VACIO ) &&
+                     lista_declaraciones_prima.tipo.equals ( VACIO ) ) 
+                    lista_declaraciones.tipo = VACIO;
+                else {
+                    lista_declaraciones.tipo = ERROR_TIPO;
+                    cmp.me.error ( Compilador.ERR_SEMANTICO,
+                            "[lista_declaraciones] Error de tipos en la seccion de declaraciones de variables.");
+                }
+                    
+            }
+            // Fin accion semantica 8
+            
         } else {
             error ( "[lista_declaraciones] Se esperaba una declaracion "
                     + "de variable en la lista. "
@@ -202,30 +290,76 @@ public class SintacticoSemantico {
     // Autor: Cristian Gabriel Piña Rosales 18130588
     // PRIMEROS(lista_declaraciones’) = {,, empty}
     
-    private void lista_declaraciones_prima () {
+    private void lista_declaraciones_prima ( Atributos lista_declaraciones_prima ) {
+        
+        Atributos lista_declaraciones = new Atributos ();
+        
         if ( preAnalisis.equals ( "," ) ) {
             // lista_declaraciones' -> , lista_declaraciones
             emparejar ( "," );
-            lista_declaraciones ();
-        } /* else {
+            lista_declaraciones ( lista_declaraciones );
+            
+            // Accion semantica 9
+            if ( analizarSemantica ) {
+                if ( lista_declaraciones_prima.tipoaux.equals ( VACIO ) &&
+                     lista_declaraciones.tipo.equals ( VACIO ) )
+                    lista_declaraciones_prima.tipo = VACIO;
+                else {
+                    lista_declaraciones_prima.tipo = VACIO;
+                    cmp.me.error ( Compilador.ERR_SEMANTICO,
+                            "[lista_declaraciones_prima] Error de tipos en la seccion de declaraciones de variables.");
+                    
+                }
+            }
+            // Fin accion semantica 9
+            
+        } else {
             // listas_declaraciones' -> empty
-        } */
+            // Accion semantica 3
+            if ( analizarSemantica ) 
+                lista_declaraciones_prima.tipo = VACIO;
+            // Fin accion semantica 3
+        } 
     }
     
     //--------------------------------------------------------------------------
     // Autor: Cristian Gabriel Piña Rosales 18130588
     // PRIMEROS(tipo) = {integer, single, string}
     
-    private void tipo () {
+    private void tipo ( Atributos tipo ) {
+        
+        // No se requieren variables locales
+        
         if ( preAnalisis.equals ( "integer" ) ) {
             // tipo -> integer
             emparejar ( "integer" );
+            
+            // Accion semantica 4
+            if ( analizarSemantica ) {
+                tipo.tipo = "integer";
+            }
+            // Fin accion semantica 4
+            
         } else if ( preAnalisis.equals ( "single" ) ) {
             // tipo -> single
             emparejar ( "single" );
+            
+            // Accion semantica 5
+            if ( analizarSemantica ) {
+                tipo.tipo = "single";
+            }
+            // Fin accion semantica 5
+            
         } else if ( preAnalisis.equals ( "string" ) ) {
             // tipo -> string
             emparejar ( "string" );
+            
+            // Accion semantica 6
+            if ( analizarSemantica ) {
+                tipo.tipo = "string";
+            }
+            // Fin accion semantica 6
+            
         } else {
             error ( "[tipo] Se esperaba una constante integer, "
                     + "single y string. "
@@ -238,15 +372,16 @@ public class SintacticoSemantico {
     // PRIMEROS(declaraciones_subprogramas) = {PRIMEROS(declaracion_subprograma), 
     //                                         empty}
     
-    private void declaraciones_subprogramas () {
+    /*
+    private void declaraciones_subprogramas ( Atributos declaraciones_subprogramas ) {
         if ( preAnalisis.equals ( "function" ) || preAnalisis.equals ( "sub" ) ) {
             // declaraciones_subprogramas -> declaracion_subprograma 
             //                               declaraciones_subprogramas
             declaracion_subprograma ();
             declaraciones_subprogramas ();
-        } /* else {
+        } else {
             // declaraciones_subprogramas -> empty
-        } */
+        } 
     }
     
     //--------------------------------------------------------------------------
@@ -254,7 +389,7 @@ public class SintacticoSemantico {
     // PRIMEROS(declaracion_subprograma) = {PRIMEROS(declaracion_funcion), 
     //                                      PRIMEROS(declaracion_subrutina)}
     
-    private void declaracion_subprograma () {
+    private void declaracion_subprograma ( Atributos declaracion_subprograma ) {
         if ( preAnalisis.equals ( "function" ) ) {
             //declaracion_subprograma -> declaracion_funcion
             declaracion_funcion ();
@@ -272,10 +407,10 @@ public class SintacticoSemantico {
     // Autor: Cristian Gabriel Piña Rosales 18130588
     // PRIMEROS(declaracion_funcion) = {function}
     
-    private void declaracion_funcion () {
+    private void declaracion_funcion ( Atributos declaracion_funcion ) {
         if ( preAnalisis.equals ( "function" ) ) {
             /* declaracion_funcion -> function id argumentos as tipo 
-                                      proposiciones_optativas end function */
+                                      proposiciones_optativas end function 
             emparejar ( "function" );
             emparejar ( "id" );
             argumentos ();
@@ -294,11 +429,11 @@ public class SintacticoSemantico {
     // Autor: Jose Misael Adame Sandoval 18131209
     // PRIMEROS(declaracion_subrutina) = {sub}
     
-    private void declaracion_subrutina () {
+    private void declaracion_subrutina ( Atributos declaracion_subrutina ) {
         if ( preAnalisis.equals ( "sub" ) ) {
             /* declaracion_subrutina -> sub id argumentos proposiciones_optativas
                                         end sub
-            */
+            
             emparejar ( "sub" );
             emparejar ( "id" );
             argumentos ();
@@ -315,37 +450,37 @@ public class SintacticoSemantico {
     // Autor: Jose Misael Adame Sandoval 18131209
     // PRIMEROS(argumentos) = {(, empty}
     
-    private void argumentos () {
+    private void argumentos ( Atributos argumentos ) {
         if ( preAnalisis.equals ( "(" ) ) {
             // argumentos -> ( lista_declaraciones ) 
             emparejar ( "(" );
             lista_declaraciones ();
             emparejar ( ")" );
-        } /* else {
+        } else {
             // argumentos -> empty
-        } */
+        } 
     }
     
     //--------------------------------------------------------------------------
     // Autor: Jose Misael Adame Sandoval 18131209
     // PRIMEROS(proposiciones_optativas) = {PRIMEROS(proposicion), empty}
     
-    private void proposiciones_optativas () {
+    private void proposiciones_optativas ( Atributos proposiciones_optativas ) {
         if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "call" ) ||
              preAnalisis.equals ( "if" ) || preAnalisis.equals ( "do" ))  {
             // proposiciones_optativas -> proposicion proposiciones_optativas
             proposicion ();
             proposiciones_optativas ();
-        } /* else {
+        } else {
             // proposiciones_optativias -> empty
-        } */
+        }
     }
     
     //--------------------------------------------------------------------------
     // Autor: Jose Misael Adame Sandoval 18131209
     // PRIMEROS(proposicion) = {id, call, if, do}
     
-    private void proposicion () {
+    private void proposicion ( Atributos proposicion ) {
         if ( preAnalisis.equals ( "id" ) ) {
             // proposicion -> id opasig expresion
             emparejar ( "id" );
@@ -384,57 +519,57 @@ public class SintacticoSemantico {
     // Autor: Jose Misael Adame Sandoval 18131209
     // PRIMEROS(proposicion’) = {(, empty}
     
-    private void proposicion_prima () {
+    private void proposicion_prima ( Atributos proposicion_prima ) {
         if ( preAnalisis.equals ( "(" ) ) {
             // proposicion' -> ( lista_expresiones ) 
             emparejar ( "(" );
             lista_expresiones ();
             emparejar ( ")" );
-        } /* else {
+        } else {
             // proposicion' -> empty
-        } */
+        } 
     }
     
     //--------------------------------------------------------------------------
     // Autor: Jose Misael Adame Sandoval 18131209
     // PRIMEROS(lista_expresiones) = {PRIMEROS(expresion), empty}
     
-    private void lista_expresiones () {
+    private void lista_expresiones ( Atributos lista_expresiones ) {
         if ( preAnalisis.equals ( "id" )  || preAnalisis.equals ( "num" ) || 
              preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) || 
              preAnalisis.equals ( "literal" ) ) {
             // lista_expresiones -> expresion lista_expresiones' 
             expresion ();
             lista_expresiones_prima ();
-        } /* else {
+        } else {
             // lista_expresiones -> empty
-        } */
+        } 
     }
     
     //--------------------------------------------------------------------------
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(lista_expresiones') = {,, empty}
     
-     private void lista_expresiones_prima () {
+     private void lista_expresiones_prima ( Atributos lista_expresiones_prima ) {
         if ( preAnalisis.equals ( "," ) ) {
-            /*lista_expresiones' -> , expresion lista_expresiones' */
+            /*lista_expresiones' -> , expresion lista_expresiones' 
             emparejar ( "," );
             expresion ();
             lista_expresiones_prima ();
-        } /* else { 
+        } else { 
             // lista_expresiones' -> empty
-        } */
+        } 
     }
     
     //--------------------------------------------------------------------------
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(condicion) = {PRIMEROS(expresion)}
     
-    private void condicion () {
+    private void condicion ( Atributos condicion ) {
         if ( preAnalisis.equals ( "id" )  || preAnalisis.equals ( "num" ) || 
              preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) || 
              preAnalisis.equals ( "literal" ) ) {
-            /* condicion -> expresion oprel expresion */
+            /* condicion -> expresion oprel expresion 
             expresion ();
             emparejar ( "oprel" );
             expresion ();
@@ -450,10 +585,10 @@ public class SintacticoSemantico {
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(expresion) = {PRIMEROS(termino), literal}
     
-    private void expresion () {
+    private void expresion ( Atributos expresion ) {
         if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "num" ) ||
              preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) ) {
-            /* expresion -> termino expresion' */
+            /* expresion -> termino expresion' 
             termino ();
             expresion_prima ();
         } else if ( preAnalisis.equals ( "literal" ) ){
@@ -470,22 +605,22 @@ public class SintacticoSemantico {
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(expresion') = {opsuma, empty}
     
-    private void expresion_prima () {
+    private void expresion_prima ( Atributos expresion_prima ) {
         if ( preAnalisis.equals ( "opsuma" ) ) {
-            /* expresion' -> opsuma termino expresiom' */
+            /* expresion' -> opsuma termino expresiom' 
             emparejar ( "opsuma" );
             termino ();
             expresion_prima ();
-        } /* else { 
+        } else { 
             // expresion' -> empty
-        } */
+        }
     }
     
     //--------------------------------------------------------------------------
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(termino) = {PRIMEROS(factor)}
     
-    private void termino () {
+    private void termino ( Atributos termino ) {
         if ( preAnalisis.equals ( "id" ) || preAnalisis.equals ( "num" ) ||
              preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" )) {
             // termino -> factor termino'
@@ -501,22 +636,22 @@ public class SintacticoSemantico {
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(termino') = {opmult, empty}
     
-    private void termino_prima () {
+    private void termino_prima ( Atributos termino_prima ) {
         if ( preAnalisis.equals ( "opmult" ) ) {
-            /* termino' -> opmult factor termino' */
+            /* termino' -> opmult factor termino' 
             emparejar ( "opmult" );
             factor ();
             termino_prima ();
-        } /* else {
+        } else {
             // termino' -> empty
-        } */
+        }
     }
     
     //--------------------------------------------------------------------------
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(factor) = {id, num, num.num, (}
     
-    private void factor () {
+    private void factor ( Atributos factor ) {
         if ( preAnalisis.equals ( "id" ) ) {
             // factor -> id factor'
             emparejar ( "id" );
@@ -546,16 +681,17 @@ public class SintacticoSemantico {
     // Autor: Sergio Alejandro Chairez Garcia 17130772
     // PRIMEROS(factor') = {(, empty}
     
-    private void factor_prima () {
+    private void factor_prima ( Atributos factor_prima ) {
         if ( preAnalisis.equals ( "(" ) ) {
-            /* factor' -> ( lista_expresiones ) */
+            /* factor' -> ( lista_expresiones )
             emparejar ( "(" );
             lista_expresiones ();
             emparejar ( ")" );
-        } /* else {
+        } else {
             // factor' -> empty
-        } */
+        }
     }
+     */
 }
 
 //------------------------------------------------------------------------------
