@@ -50,6 +50,10 @@
  *:                                 termino_prima ()
  *:                                 factor ()
  *:                                 factor_prima ()
+ *:
+ *: 20/Mayo/2021 18131209 Misael Adame       Se agregaron 49 acciones semanticas
+ *:              18130588 Cristian Piña      del comprobador de tipos estatico
+ *:              17130772 Sergio Chairez     para el analisis semantico
  *:----------------------------------------------------------------------------
  */
 package compilador;
@@ -273,7 +277,7 @@ public class SintacticoSemantico {
                         }
                     } else if ( ! lista_declaraciones_prima.t.equals ( ERROR_TIPO ) ) {
                         if ( ! lista_declaraciones_prima.t.equals ( VACIO ) )
-                            lista_declaraciones.t = tipo.t + " X " + lista_declaraciones_prima.t;
+                            lista_declaraciones.t = tipo.t + "X" + lista_declaraciones_prima.t;
                         else
                             lista_declaraciones.t = tipo.t;
                     } else {
@@ -475,7 +479,7 @@ public class SintacticoSemantico {
             if ( analizarSemantica ) {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) &&
                      ! argumentos.t.equals ( ERROR_TIPO ) ) {
-                    expresion_tipo = argumentos.t + " -> " + tipo.t;
+                    expresion_tipo = argumentos.t + "->" + tipo.t;
                     cmp.ts.anadeTipo ( id.entrada, expresion_tipo );
                     declaracion_funcion.taux = VACIO;
                 } else {
@@ -533,7 +537,7 @@ public class SintacticoSemantico {
             if ( analizarSemantica ) {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) &&
                      ! argumentos.t.equals ( ERROR_TIPO ) ) {
-                    expresion_tipo = argumentos.t + " -> void";
+                    expresion_tipo = argumentos.t + "->void";
                     cmp.ts.anadeTipo ( id.entrada, expresion_tipo );
                     declaracion_subrutina.taux = VACIO;
                 } else {
@@ -713,15 +717,15 @@ public class SintacticoSemantico {
                     }
                 } else {
                     proposicion.t = ERROR_TIPO;
-                    cmp.me.error ( Compilador.ERR_SEMANTICO, "[proposicion] Error. "
-                    + "Argumentos no validos.");
+                    cmp.me.error ( Compilador.ERR_SEMANTICO, 
+                            "[proposicion] Error los argumentos no son validos.");
                 }
             }
             // Fin accion semantica 27
             
         } else if ( preAnalisis.equals ( "if" ) ) {
             // proposicion -> if condicion then proposicicones_optativas else 
-            //                proposiciones_optativas end if
+            //                proposiciones_optativas end if {28}
             emparejar ( "if" );
             condicion ( condicion );
             emparejar ( "then" );
@@ -730,13 +734,42 @@ public class SintacticoSemantico {
             proposiciones_optativas ( proposiciones_optativas1 );
             emparejar ( "end" );
             emparejar ( "if" );
+            
+            // Accion semantica 28
+            if ( analizarSemantica ) {
+                if ( condicion.t.equals ( "boolean" ) && 
+                     proposiciones_optativas.t.equals ( VACIO ) && 
+                     proposiciones_optativas1.t.equals ( VACIO ) ) 
+                    proposicion.t = VACIO;
+                else {
+                    proposicion.t = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                            "[proposicion] Error en las expresiones " );
+                }
+            }
+            // Fin accion semantica 28
+            
         } else if ( preAnalisis.equals ( "do" ) ) {
-            // proposicion -> do while condicion proposiciones_optativas loop
+            // proposicion -> do while condicion proposiciones_optativas loop {29}
             emparejar ( "do" );
             emparejar ( "while" );
             condicion ( condicion1 );
             proposiciones_optativas ( proposiciones_optativas2 );
             emparejar ( "loop" );
+            
+            // Accion semantica 29
+            if ( analizarSemantica ) {
+                if ( condicion1.t.equals ( "boolean" ) && 
+                     proposiciones_optativas2.t.equals ( VACIO ) ) {
+                    proposicion.t = VACIO;
+                } else {
+                    proposicion.t = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                            "[proposicion] Error en las expresiones.");                  
+                }
+            }
+            // Fin accion semantica 29
+            
         } else {
             error ( "[proposicion] Se esperaba una proposicion valida. "
                    + "No. de Linea " + cmp.be.preAnalisis.numLinea );
@@ -748,13 +781,28 @@ public class SintacticoSemantico {
     // PRIMEROS(proposicion’) = {(, empty}
     
     private void proposicion_prima ( Atributos proposicion_prima ) {
+        
+        Atributos lista_expresiones = new Atributos ();
+        
         if ( preAnalisis.equals ( "(" ) ) {
-            // proposicion' -> ( lista_expresiones ) 
+            // proposicion' -> ( lista_expresiones ) {31}
             emparejar ( "(" );
             lista_expresiones ( lista_expresiones );
             emparejar ( ")" );
+            
+            // Accion semantica 31
+            if ( analizarSemantica )
+                proposicion_prima.t = lista_expresiones.t;
+            // Fin accion semantica 31
+           
+            
         } else {
-            // proposicion' -> empty
+            // proposicion' -> empty {30}
+            
+            // Accion semantica 30
+            if ( analizarSemantica ) 
+                proposicion_prima.t = "void->";
+            // Fin accion semantica 30 
         } 
     }
     
@@ -763,14 +811,49 @@ public class SintacticoSemantico {
     // PRIMEROS(lista_expresiones) = {PRIMEROS(expresion), empty}
     
     private void lista_expresiones ( Atributos lista_expresiones ) {
+        
+        Atributos expresion = new Atributos ();
+        Atributos lista_expresiones_prima = new Atributos ();
+        
         if ( preAnalisis.equals ( "id" )  || preAnalisis.equals ( "num" ) || 
              preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) || 
              preAnalisis.equals ( "literal" ) ) {
-            // lista_expresiones -> expresion lista_expresiones' 
+            // lista_expresiones -> expresion lista_expresiones' {33}
             expresion ( expresion );
             lista_expresiones_prima ( lista_expresiones_prima );
+            
+            // Accion semantica 33
+            if ( analizarSemantica ) {
+                if ( ! expresion.t.equals ( ERROR_TIPO ) && 
+                     ! lista_expresiones_prima.t.equals ( ERROR_TIPO ) ) {
+                    if ( lista_expresiones_prima.t.equals ( VACIO ) ) {
+                        if ( expresion.t.equals ( "integer" ) )
+                            lista_expresiones.t = "(integer|single)->";
+                        else
+                            lista_expresiones.t = expresion.t + "->";
+                    } else {
+                        if ( expresion.t.equals ( "integer" ) )
+                            lista_expresiones.t = "(integer|single)" + lista_expresiones_prima.t;
+                        else
+                            lista_expresiones.t = expresion.t + lista_expresiones_prima.t;
+                        
+                    }
+                } else {
+                    lista_expresiones.t = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                            "[lista_expresiones] Error en las expresiones.");
+                }
+            }
+            // Fin accion semantica 33
+            
         } else {
-            // lista_expresiones -> empty
+            // lista_expresiones -> empty {32}
+            
+            // Accion semantica 32
+            if ( analizarSemantica ) 
+                lista_expresiones.t = "void->";
+            // Fin accion semantica 32 
+            
         } 
     }
     
@@ -779,13 +862,49 @@ public class SintacticoSemantico {
     // PRIMEROS(lista_expresiones') = {,, empty}
     
      private void lista_expresiones_prima ( Atributos lista_expresiones_prima ) {
+         
+        Atributos expresion = new Atributos ();
+        Atributos lista_expresiones_prima1 = new Atributos ();
+         
         if ( preAnalisis.equals ( "," ) ) {
-            // lista_expresiones' -> , expresion lista_expresiones' 
+            // lista_expresiones' -> , expresion lista_expresiones'1 {35} 
             emparejar ( "," );
-            expresion ( expresionn );
-            lista_expresiones_prima ();
+            expresion ( expresion );
+            lista_expresiones_prima ( lista_expresiones_prima1 );
+            
+            // Accion semantica 35
+            if (analizarSemantica) {
+                if ( ! expresion.t.equals ( ERROR_TIPO ) && 
+                     ! lista_expresiones_prima1.t.equals ( ERROR_TIPO ) ) {
+                    if ( ! lista_expresiones_prima1.t.equals ( VACIO ) ) {             
+                        if ( expresion.t.equals ( "integer" ) )
+                            lista_expresiones_prima.t = "X(integer|single)X" + lista_expresiones_prima1.t;
+                        else
+                            lista_expresiones_prima.t = "X" + expresion.t + "X" + lista_expresiones_prima1.t;
+                    } else {
+                        if ( expresion.t.equals ( "integer" ) )
+                            lista_expresiones_prima.t = "(integer|single)->";
+                        else
+                            lista_expresiones_prima.t = expresion.t + "->";      
+                    }
+                } else {
+                    lista_expresiones_prima.t = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, "[lista_expresiones'] Error en las expresiones");
+                }
+            }
+            // Fin accion semantica 35
+            
+            
         } else { 
-            // lista_expresiones' -> empty
+            // lista_expresiones' -> empty {34}
+            
+            // Accion semantica 34
+            if ( analizarSemantica ) 
+                lista_expresiones_prima.t = VACIO;
+            // Fin accion semantica 34 
+            
+            
+            
         } 
     }
     
@@ -794,13 +913,40 @@ public class SintacticoSemantico {
     // PRIMEROS(condicion) = {PRIMEROS(expresion)}
     
     private void condicion ( Atributos condicion ) {
+        
+        Atributos expresion = new Atributos ();
+        Atributos expresion1 = new Atributos ();
+        
         if ( preAnalisis.equals ( "id" )  || preAnalisis.equals ( "num" ) || 
              preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) || 
              preAnalisis.equals ( "literal" ) ) {
-            // condicion -> expresion oprel expresion 
-            expresion ();
+            // condicion -> expresion oprel expresion1 {46}
+            expresion ( expresion );
             emparejar ( "oprel" );
-            expresion ();
+            expresion ( expresion1 );
+            
+            // Accion semantica 46
+            if (analizarSemantica) {
+                if ( ! expresion.t.equals ( ERROR_TIPO) && 
+                     ! expresion1.t.equals ( ERROR_TIPO ) ) {
+                    if (expresion.t.equals ( expresion1.t) ) 
+                        condicion.t = "boolean";
+                    else if ( ! expresion.t.equals ( "string" ) && 
+                              ! expresion1.t.equals ( "string" ) ) 
+                        condicion.t = "boolean";
+                    else {
+                        condicion.t = ERROR_TIPO;
+                        cmp.me.error(Compilador.ERR_SEMANTICO, 
+                                "[condicion] Error existe una incompatibilidad en la comparacion de tipos de "
+                                + expresion.t + " y " + expresion1.t );
+                    }
+                } else {
+                    condicion.t = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, "[condicion] Error en las expresiones.");
+                }
+            }
+            // Fin accion semantica 46
+            
         } else {
             error ( "[condicion] Se esperaba el nombre de un identificador, "
                     + "una constante numérica, o paréntesis o una literal "
@@ -826,7 +972,22 @@ public class SintacticoSemantico {
             expresion_prima ( expresion_prima );
             
             // Accion semantica 45
-            
+            if ( analizarSemantica ) {
+                if (! termino.t.equals ( ERROR_TIPO ) && 
+                    ! expresion_prima.t.equals ( ERROR_TIPO ) ) {
+                    if (expresion_prima.t.equals ( VACIO ) ) 
+                        expresion.t = termino.t;
+                    else if ( termino.t.equals ( expresion_prima.t ) ) 
+                        expresion.t = termino.t;
+                    else 
+                        expresion.t = "single";    
+                } else {
+                    expresion.t = ERROR_TIPO;
+
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                            "[expresion] Error en el analisis de la expresion.");
+                }
+            }
             // Fin accion semantica 45
             
         } else if ( preAnalisis.equals ( "literal" ) ){
@@ -835,8 +996,10 @@ public class SintacticoSemantico {
             emparejar ( "literal" );
             
             // Accion semantica 38
-            if ( analizarSemantica ) 
-                expresion.t = cmp.ts.buscaTipo( literal.entrada );;
+            if ( analizarSemantica ) {
+                cmp.ts.anadeTipo ( literal.entrada, "string" );
+                expresion.t = cmp.ts.buscaTipo ( literal.entrada );
+            }
             // Fin accion semantica 38
             
         } else {
@@ -856,7 +1019,7 @@ public class SintacticoSemantico {
         Atributos expresion_prima1 = new Atributos ();
         
         if ( preAnalisis.equals ( "opsuma" ) ) {
-            // expresion' -> opsuma termino expresion' {39} 
+            // expresion' -> opsuma termino expresion'1 {39} 
             emparejar ( "opsuma" );
             termino ( termino );
             expresion_prima ( expresion_prima1 );
@@ -908,22 +1071,22 @@ public class SintacticoSemantico {
             if ( analizarSemantica ) {
                 if ( ! factor.t.equals ( ERROR_TIPO ) && 
                      ! termino_prima.t.equals ( ERROR_TIPO ) ) {
-                    if (termino_prima.t.equals ( VACIO ) ) {
+                    if (termino_prima.t.equals ( VACIO ) ) 
                         termino.t = factor.t;
-                    } else if ( factor.t.equals ( termino_prima.t ) ) {
+                    else if ( factor.t.equals ( termino_prima.t ) ) 
                         termino.t = factor.t;
-                    } else if ( ! factor.t.equals ( "string" ) ) {
+                    else if ( ! factor.t.equals ( "string" ) ) 
                         termino.t = "single";
-                    } else {
+                    else {
                         termino.t = ERROR_TIPO;
                         cmp.me.error(Compilador.ERR_SEMANTICO, 
                                 "[termino] Error, los tipos de dato no son compatibles.");
                     }
+                } else {
+                    termino.t = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                            "[termino] Error, los tipos de dato no son compatibles.");
                 }
-            } else {
-                termino.t = ERROR_TIPO;
-                cmp.me.error(Compilador.ERR_SEMANTICO, 
-                        "[termino] Error, Error, los tipos de dato no son compatibles.");
             }
             // Fin accion semantica 41
             
@@ -951,13 +1114,13 @@ public class SintacticoSemantico {
             // Accion semantica 42
             if ( analizarSemantica ) {
                 if ( ! factor.t.equals ( ERROR_TIPO ) && ! termino_prima1.t.equals ( ERROR_TIPO ) ) {
-                    if (termino_prima1.t.equals ( VACIO ) ) {
+                    if (termino_prima1.t.equals ( VACIO ) )
                         termino_prima.t = factor.t;
-                    } else if ( factor.t.equals ( termino_prima1.t ) ) 
+                    else if ( factor.t.equals ( termino_prima1.t ) ) 
                         termino_prima.t = factor.t;
-                    else if ( ! factor.t.equals ( "string" ) ) {
+                    else if ( ! factor.t.equals ( "string" ) ) 
                         termino_prima.t = "single";
-                    } else {
+                    else {
                         termino_prima.t = ERROR_TIPO;
                         cmp.me.error(Compilador.ERR_SEMANTICO, 
                                 "[termino'] Error, los tipos de dato no son compatibles.");
@@ -1002,7 +1165,7 @@ public class SintacticoSemantico {
             // Accion semantica 44
             if ( analizarSemantica ) {
                 if ( ! factor_prima.t.equals ( ERROR_TIPO ) ) {
-                    if ( factor_prima.t.equals ( VACIO ) )
+                    if ( factor_prima.t.equals ( VACIO ) ) {
                         if ( !cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) )
                             factor.t = cmp.ts.buscaTipo ( id.entrada );
                         else {
@@ -1010,7 +1173,7 @@ public class SintacticoSemantico {
                             cmp.me.error( Compilador.ERR_SEMANTICO, 
                                     "[factor] Error, identificador sin ningun tipo de dato : " + id.lexema );
                         } 
-                    else {
+                    } else {
                         String expresion_tipo = factor_prima.t + "integer";
                         if ( Pattern.matches ( expresion_tipo, cmp.ts.buscaTipo ( id.entrada ) ) )
                             factor.t = "integer";
@@ -1044,8 +1207,11 @@ public class SintacticoSemantico {
             emparejar ( "num" );
             
             // Accion semantica 37
-            if ( analizarSemantica )
+            if ( analizarSemantica ) {
+                cmp.ts.anadeTipo ( num.entrada, "integer" );
                 factor.t = cmp.ts.buscaTipo( num.entrada );
+                
+            }
             // Fin accion semantica 37
             
         } else if ( preAnalisis.equals ( "num.num" ) ) {
@@ -1054,8 +1220,11 @@ public class SintacticoSemantico {
             emparejar ( "num.num" );
             
             // Accion semantica 36
-            if ( analizarSemantica )
+            if ( analizarSemantica ) {
+                cmp.ts.anadeTipo ( num_num.entrada, "single" );
                 factor.t = cmp.ts.buscaTipo( num_num.entrada );
+            
+            }
             // Fin accion semantica 36
             
         } else if ( preAnalisis.equals ( "(" ) ){
