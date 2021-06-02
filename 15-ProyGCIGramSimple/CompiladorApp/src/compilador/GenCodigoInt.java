@@ -139,7 +139,7 @@ private void S()
                 // Accion semantica 1
                 p = cmp.ts.buscar(id.lexema);
                 if ( p != NIL ) 
-                    emite ( p + ":=" + E.Lugar );
+                    emite ( "[" +p +"]" + ":=" + E.Lugar );
                 else
                     cmp.me.error(Compilador.ERR_CODINT, 
                             "[S] No se encontro el lexema " +id.lexema +
@@ -149,6 +149,7 @@ private void S()
             }
           else {
                 //S -> EMPTY
+                
             }
 }
 //------------------------------------------------------------------------
@@ -169,21 +170,39 @@ private void E( Atributos E )
                  E.Lugar = "["  + num.entrada + "]";
              else {
                  E.Lugar = tempnuevo ();
-                 emite ( E.Lugar + ":=" + num.entrada + Ep.op + Ep.Lugar );
+                 emite ( E.Lugar + ":=" + "[" +num.entrada +"]" + Ep.op + Ep.Lugar );
              }
              // Fin accion semantica 5
 	}
          else if ( cmp.be.preAnalisis.complex.equals ( "num.num" ) ){
              //E -> num.num  E'
+             numnum = cmp.be.preAnalisis; // Salvamos atributos de numnum
              emparejar ( "num.num" ) ;
-             Ep ();             
+             Ep ( Ep );
+             // Accion semantica 6
+             if ( Ep.op.equals ( "" ) )
+                 E.Lugar = "[" + numnum.entrada + "]";
+             else {
+                E.Lugar = tempnuevo ();
+                emite ( E.Lugar + ":=" + "[" + numnum.entrada +"]" + Ep.op + Ep.Lugar);
+             }     
+            // Fin accion semantica 6
 	}
          else if ( cmp.be.preAnalisis.complex.equals ( "id" ) ){
              //E -> id E'
+             id = cmp.be.preAnalisis; // Salvamos atributos de id
              emparejar ( "id" ) ;
-             Ep ();
+             Ep ( Ep );
+             // Accion semantica 7
+             if ( Ep.op.equals ( "" ) )
+                 E.Lugar = "[" + id.entrada + "]";
+             else {
+                E.Lugar = tempnuevo ();
+                emite ( E.Lugar + ":=" +"[" + id.entrada +"]"  + Ep.op + Ep.Lugar);
+             } 
+            // Fin accion semantica 7
 	}         
-         else{
+         else {
             error("Error de E");
          }
 }
@@ -194,12 +213,20 @@ private void Ep ( Atributos Ep ) {
     Atributos E = new Atributos ();
     Linea_BE oparit = new Linea_BE ();
     
-    if ( cmp.be.preAnalisis.equals ( "oparit" ) ) {
+    if ( cmp.be.preAnalisis.complex.equals ( "oparit" ) ) {
         // E' -> oparit E
+        oparit = cmp.be.preAnalisis; // Salvamos los atributos de oparit
         emparejar ( "oparit" );
-        E ();
+        E ( E );
+        // Accion semantica 8
+        Ep.op = oparit.lexema;
+        Ep.Lugar = E.Lugar;
+        // Fin accion semantica 8
     } else {
         // E' -> empty
+        // Accion semantica 9
+        Ep.op = "";
+        // Fin accion semantica 9
     }
 }
      
