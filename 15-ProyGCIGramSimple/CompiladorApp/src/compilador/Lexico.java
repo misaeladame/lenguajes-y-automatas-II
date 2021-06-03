@@ -150,7 +150,7 @@ public class Lexico {
    {      
        String palres[] = {"program","var","array","of","integer","real","function",
            "procedure","begin","end","if","then","else","while","do","not","caracter","entero",
-       "real", "arreglo","inicio", "fin"};
+       "real", "arreglo","inicio", "fin", "mientras", "hacer"};
        for (int i = 0; i < palres.length; i++) {
            if (lex.equals ( palres[i] ) ) {       
                return true; 

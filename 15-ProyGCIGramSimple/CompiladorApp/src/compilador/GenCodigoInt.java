@@ -23,7 +23,10 @@
  *:                                 V -> id : T  V | empty
  *:                                 T -> caracter | entero | real 
  *:                                 C -> inicio S fin
- *:                                 S -> id := E  S  |  empty
+ *:                                 S -> id := E  S  |  
+ *:                                      mientras K hacer inicio S1 fin S |
+ *:                                      empty
+ *:                                 K -> E1 oprel E2
  *:                                 E -> num  E' | num.num  E' |  id  E'
  *:                                 E'-> oparit E  |  empty 
  *:-----------------------------------------------------------------------------
@@ -147,7 +150,17 @@ private void S()
                 // Fin accion semantica 1
                 S();
             }
-          else {
+        else if ( cmp.be.preAnalisis.complex.equals ( "mientras" ) ) {
+            // S -> mientras K hace inicio S1 fin S
+            emparejar ( "mientras" );
+            K ();
+            emparejar ( "hacer" );
+            emparejar ( "inicio" );
+            S ();
+            emparejar ( "fin" );
+            S ();
+        } else
+            {
                 //S -> EMPTY
                 
             }
@@ -206,6 +219,20 @@ private void E( Atributos E )
             error("Error de E");
          }
 }
+
+    private void K () {
+        
+        if ( cmp.be.preAnalisis.complex.equals ( "num" ) ||
+             cmp.be.preAnalisis.complex.equals ( "num.num" ) || 
+             cmp.be.preAnalisis.complex.equals ( "id" ) ) {
+            // K -> E oprel E
+            E ();
+            emparejar ( "oprel" );
+            E ();
+        } else {
+            error ( "Error de K" );
+        }
+    }
 
 //------------------------------------------------------------------------
 
