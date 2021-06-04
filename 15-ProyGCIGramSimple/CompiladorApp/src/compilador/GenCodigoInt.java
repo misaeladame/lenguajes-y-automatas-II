@@ -41,6 +41,7 @@ public class GenCodigoInt {
     private Compilador cmp;
     private int        p; // Auxiliar en las acciones semanticas
     private int        consecTemp;  // Consecutivo de variables temporales nuevos
+    private int        consecEtiq;  // Consecutivo de etiquetas nuevas
     
     //--------------------------------------------------------------------------
     // Constructor de la clase, recibe la referencia de la clase principal del 
@@ -54,7 +55,8 @@ public class GenCodigoInt {
     
     public void generar () {
         consecTemp = 1;
-        P ();
+        consecEtiq = 0;
+        P ();     
     }    
 
     //--------------------------------------------------------------------------
@@ -68,6 +70,10 @@ public class GenCodigoInt {
     }
 
     //--------------------------------------------------------------------------
+    
+    private String etiqnueva () {
+        return "etiq" + consecEtiq++;
+    }
     
     private void P()
     {
@@ -117,10 +123,11 @@ private void T () {
 }  
 private void C()
 {
+    Atributos S = new Atributos ();
 	if (cmp.be.preAnalisis.complex.equals ( "inicio" ) ) {
             //C -> inicio S fin
             emparejar ( "inicio" ) ;
-            S ();
+            S ( S );
             emparejar ( "fin" );
         }
         else{
@@ -128,10 +135,12 @@ private void C()
          }
 }
 //________________________________________________________________________
-private void S()
+private void S ( Atributos S )
 {
     Linea_BE id = new Linea_BE ();
     Atributos E = new Atributos ();
+    Atributos K = new Atributos ();
+    Atributos S1 = new Atributos ();
     
 	if (cmp.be.preAnalisis.complex.equals ( "id" ) ) {
                 //S -> id := E  S
@@ -148,17 +157,29 @@ private void S()
                             "[S] No se encontro el lexema " +id.lexema +
                             " en la Tabla de Simbolos");
                 // Fin accion semantica 1
-                S();
+                S( S );
             }
         else if ( cmp.be.preAnalisis.complex.equals ( "mientras" ) ) {
             // S -> mientras K hace inicio S1 fin S
             emparejar ( "mientras" );
-            K ();
+            // Accion semantica
+            S.comienzo = etiqnueva ();
+            S.siguiente = etiqnueva ();
+            K.verdadera = etiqnueva ();
+            K.falsa = S.siguiente;
+            S1.siguiente = S.comienzo;
+            emite ( S.comienzo + " : " );
+            // Fin accion semantica
+            K ( K );
             emparejar ( "hacer" );
             emparejar ( "inicio" );
-            S ();
+            S ( S );
+            // Accion semantica
+            emite ( " goto " + S.comienzo );
+            emite ( K.falsa + " : ");
+            // Fin accion semantica
             emparejar ( "fin" );
-            S ();
+            S ( S1 );
         } else
             {
                 //S -> EMPTY
@@ -220,15 +241,28 @@ private void E( Atributos E )
          }
 }
 
-    private void K () {
+    private void K ( Atributos K ) {
+        
+        Atributos E1 = new Atributos ();
+        Atributos E2 = new Atributos ();
+        Linea_BE oprel = new Linea_BE ();
         
         if ( cmp.be.preAnalisis.complex.equals ( "num" ) ||
              cmp.be.preAnalisis.complex.equals ( "num.num" ) || 
              cmp.be.preAnalisis.complex.equals ( "id" ) ) {
             // K -> E oprel E
-            E ();
+            E ( E1 );
+            oprel = cmp.be.preAnalisis;
             emparejar ( "oprel" );
-            E ();
+            E ( E2 );
+            // Accion semantica
+            
+            emite ( "if" +E1.Lugar +oprel.lexema +E2.Lugar + " goto " +K.verdadera);
+            emite (  "goto" + K.falsa);
+            emite ( K.verdadera + " : ");
+            
+            // Fin accion semantica
+            
         } else {
             error ( "Error de K" );
         }
