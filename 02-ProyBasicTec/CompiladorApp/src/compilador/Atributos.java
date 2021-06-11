@@ -23,7 +23,9 @@
  *: Ult.Modif.    :
  *:  Fecha      Modificó            Modificacion
  *:=============================================================================
- *:
+ *: 11/Jun/2021  18131209 Misael Adame       Se agregaron los atributos:
+ *:              18130588 Cristian Piña      Lugar, op, comienzo, siguiente, 
+ *:              17130772 Sergio Chairez     cierta, falsa, cdc, cdc_
  *:----------------------------------------------------------------------------
  */
 
@@ -32,4 +34,23 @@ package compilador;
 public class Atributos {
     String t;
     String taux;
+    String Lugar;
+    String op;
+    String comienzo;
+    String siguiente;
+    String cierta;
+    String falsa;
+    String cdc;
+    String cdc_;
+    
+    public Atributos () {
+        Lugar = "";
+        op    = "";
+        comienzo = "";
+        siguiente = "";
+        cierta = "";
+        falsa = "";
+        cdc = "";
+        cdc_ = "";
+    }
 }
