@@ -39,8 +39,10 @@ import javax.swing.table.DefaultTableModel;
 
 import compilador.ErroresListener;
 import compilador.Compilador;
+import compilador.Cuadruplo;
 import compilador.Linea_BE;
 import compilador.Linea_TS;
+import java.util.ArrayList;
 
 public class CompiladorFrame extends javax.swing.JFrame implements ErroresListener {
 
@@ -115,6 +117,9 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
         jpnlCodigoIntermedio = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtxaCodigoIntermedio = new javax.swing.JTextArea();
+        jpnlTablaSimbolos1 = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jtblTablaCuadruplos = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jmmuArchivo = new javax.swing.JMenu();
         jmniArchivonuevo = new javax.swing.JMenuItem();
@@ -275,7 +280,7 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
         jToolBar1.add(jbtnEjecutar);
 
         jtxaTexto.setColumns(20);
-        jtxaTexto.setFont(new java.awt.Font("Courier New", 0, 12));
+        jtxaTexto.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
         jtxaTexto.setRows(5);
         jtxaTexto.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -284,10 +289,10 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
         });
         jScrollPane1.setViewportView(jtxaTexto);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Mensajes", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, new java.awt.Color(0, 0, 0)));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Mensajes"));
 
-        jtxaMensajes.setEditable(false);
         jtxaMensajes.setColumns(20);
+        jtxaMensajes.setEditable(false);
         jtxaMensajes.setForeground(new java.awt.Color(204, 0, 0));
         jtxaMensajes.setLineWrap(true);
         jtxaMensajes.setRows(5);
@@ -299,7 +304,7 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -324,7 +329,7 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
             jpnlCodigoFuenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpnlCodigoFuenteLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -356,8 +361,10 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
             }
         });
         jScrollPane4.setViewportView(jtblBufferEnt);
-        jtblBufferEnt.getColumnModel().getColumn(2).setMinWidth(10);
-        jtblBufferEnt.getColumnModel().getColumn(2).setPreferredWidth(15);
+        if (jtblBufferEnt.getColumnModel().getColumnCount() > 0) {
+            jtblBufferEnt.getColumnModel().getColumn(2).setMinWidth(10);
+            jtblBufferEnt.getColumnModel().getColumn(2).setPreferredWidth(15);
+        }
 
         javax.swing.GroupLayout jpnlBufferEntradaLayout = new javax.swing.GroupLayout(jpnlBufferEntrada);
         jpnlBufferEntrada.setLayout(jpnlBufferEntradaLayout);
@@ -366,13 +373,13 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
             .addGroup(jpnlBufferEntradaLayout.createSequentialGroup()
                 .addGap(60, 60, 60)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addContainerGap(80, Short.MAX_VALUE))
         );
         jpnlBufferEntradaLayout.setVerticalGroup(
             jpnlBufferEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpnlBufferEntradaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -410,21 +417,21 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
             .addGroup(jpnlTablaSimbolosLayout.createSequentialGroup()
                 .addGap(62, 62, 62)
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 481, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
         jpnlTablaSimbolosLayout.setVerticalGroup(
             jpnlTablaSimbolosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpnlTablaSimbolosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jtbpPrincipal.addTab("Tabla de Simbolos", jpnlTablaSimbolos);
 
-        jtxaCodigoIntermedio.setColumns(20);
         jtxaCodigoIntermedio.setEditable(false);
-        jtxaCodigoIntermedio.setFont(new java.awt.Font("Courier New", 0, 12));
+        jtxaCodigoIntermedio.setColumns(20);
+        jtxaCodigoIntermedio.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
         jtxaCodigoIntermedio.setRows(5);
         jScrollPane3.setViewportView(jtxaCodigoIntermedio);
 
@@ -432,24 +439,68 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
         jpnlCodigoIntermedio.setLayout(jpnlCodigoIntermedioLayout);
         jpnlCodigoIntermedioLayout.setHorizontalGroup(
             jpnlCodigoIntermedioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 586, Short.MAX_VALUE)
+            .addGap(0, 594, Short.MAX_VALUE)
             .addGroup(jpnlCodigoIntermedioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jpnlCodigoIntermedioLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
                     .addContainerGap()))
         );
         jpnlCodigoIntermedioLayout.setVerticalGroup(
             jpnlCodigoIntermedioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 342, Short.MAX_VALUE)
+            .addGap(0, 356, Short.MAX_VALUE)
             .addGroup(jpnlCodigoIntermedioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jpnlCodigoIntermedioLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
                     .addContainerGap()))
         );
 
         jtbpPrincipal.addTab("Codigo Intermedio", jpnlCodigoIntermedio);
+
+        jtblTablaCuadruplos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null}
+            },
+            new String [] {
+                "Op", "Arg1", "Arg2", "Resultado"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane6.setViewportView(jtblTablaCuadruplos);
+
+        javax.swing.GroupLayout jpnlTablaSimbolos1Layout = new javax.swing.GroupLayout(jpnlTablaSimbolos1);
+        jpnlTablaSimbolos1.setLayout(jpnlTablaSimbolos1Layout);
+        jpnlTablaSimbolos1Layout.setHorizontalGroup(
+            jpnlTablaSimbolos1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpnlTablaSimbolos1Layout.createSequentialGroup()
+                .addGap(62, 62, 62)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 481, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(46, Short.MAX_VALUE))
+        );
+        jpnlTablaSimbolos1Layout.setVerticalGroup(
+            jpnlTablaSimbolos1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpnlTablaSimbolos1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jtbpPrincipal.addTab("Cuadruplos", jpnlTablaSimbolos1);
 
         jmmuArchivo.setText("Archivo");
 
@@ -713,7 +764,7 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jtbpPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE)
+                    .addComponent(jtbpPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE))
                 .addGap(10, 10, 10))
         );
@@ -722,12 +773,12 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
-                .addComponent(jtbpPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
+                .addComponent(jtbpPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-617)/2, (screenSize.height-507)/2, 617, 507);
+        setSize(new java.awt.Dimension(617, 507));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     public void EstablecerOpciones() {
@@ -1143,6 +1194,7 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
         jtxaMensajes.append("GENERACION DE CODIGO INTERMEDIO INICIADO....\n");
         jtxaCodigoIntermedio.setText ( "" );
         compilador.generarCodigoInt();
+        actualizarGUICuadruplos ();
         jtxaMensajes.append("*******Codigo Intermedio terminado*******\n");
         jtxaMensajes.append(compilador.getTotErrores ( Compilador.ERR_CODINT )
                 + "  error(es) encontrado(s).\n\n");
@@ -1271,6 +1323,7 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
@@ -1317,10 +1370,12 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
     private javax.swing.JPanel jpnlCodigoFuente;
     private javax.swing.JPanel jpnlCodigoIntermedio;
     private javax.swing.JPanel jpnlTablaSimbolos;
+    private javax.swing.JPanel jpnlTablaSimbolos1;
     private javax.swing.JRadioButtonMenuItem jrbFuenteCastellar;
     private javax.swing.JRadioButtonMenuItem jrbFuentePredeterminado;
     private javax.swing.JRadioButtonMenuItem jrbFuenteRoman;
     private javax.swing.JTable jtblBufferEnt;
+    private javax.swing.JTable jtblTablaCuadruplos;
     private javax.swing.JTable jtblTablaSimbolos;
     private javax.swing.JTabbedPane jtbpPrincipal;
     private javax.swing.JTextArea jtxaCodigoIntermedio;
@@ -1367,6 +1422,31 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
     }
 
     //--------------------------------------------------------------------------
+    private void actualizarGUICuadruplos() {
+        String[] nombresCol = {"Op", "Arg1", "Arg2", "Resultado"};
+        ArrayList<Cuadruplo> cuadruplos = compilador.getCuadruplos ();
+        Object[][] datos = new Object [ cuadruplos.size () ][ 4 ];
+
+        int i = 0;
+        
+        for ( Cuadruplo c : cuadruplos ) {
+            datos[i][0] = c.op;
+            datos[i][1] = c.arg1;
+            datos[i][2] = c.arg2;
+            datos[i][3] = c.resultado;
+            i++;
+                    
+        }
+
+
+        // Cambiamos el modelo actual del JTable de la Tabla de Simbolos por uno 
+        // nuevo con los datos de arriba. Se perderan las opciones de celdas 
+        // editables/ajustables, etc.
+        DefaultTableModel modelo = new DefaultTableModel(datos, nombresCol);
+        jtblTablaCuadruplos.setModel(
+                new DefaultTableModel(datos, nombresCol) );
+    }
+
     private void actualizarGUITablaSimbolos() {
         String[] nombresCol = {"#", "Complex", "Lexema", "Tipo", "Ambito"};
         Linea_TS[] tablaSimb = compilador.getTablaSimbolos();
@@ -1398,7 +1478,8 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
                     }
                 }*/);
     }
-
+    
+    
     //--------------------------------------------------------------------------
     private void actualizarTituloEditor() {
         if (archivoSQL != null) {

@@ -28,6 +28,8 @@
 
 package compilador;
 
+import java.util.ArrayList;
+
 
 public class Compilador {
 
@@ -48,7 +50,8 @@ public class Compilador {
 
 	ErroresListener erroresListener = null;
 
-	GenCodigoInt gci = new GenCodigoInt(this);
+	GenCodigoInt gci = new GenCodigoInt ( this );
+        Cuadruplos   cua = new Cuadruplos ( this );
     
 
 	//--------------------------------------------------------------------------
@@ -152,4 +155,9 @@ public class Compilador {
     
     //--------------------------------------------------------------------------
     
+    public ArrayList<Cuadruplo> getCuadruplos () {
+        return cua.getCuadruplos ();
+    }
+    
+    //--------------------------------------------------------------------------
 }

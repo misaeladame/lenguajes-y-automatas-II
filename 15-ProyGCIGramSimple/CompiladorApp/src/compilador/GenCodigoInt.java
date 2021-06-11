@@ -150,8 +150,12 @@ private void S ( Atributos S )
                 E( E );
                 // Accion semantica 1
                 p = cmp.ts.buscar(id.lexema);
-                if ( p != NIL ) 
+                if ( p != NIL ) {
                     emite ( "[" +p +"]" + ":=" + E.Lugar );
+                    // Formar el cuadruplo correspondiente
+                    Cuadruplo c = new Cuadruplo ( ":=", E.Lugar, "", "[" +p +"]" );
+                    cmp.cua.insertar ( c );
+                }
                 else
                     cmp.me.error(Compilador.ERR_CODINT, 
                             "[S] No se encontro el lexema " +id.lexema +
@@ -169,6 +173,9 @@ private void S ( Atributos S )
             K.falsa = S.siguiente;
             S1.siguiente = S.comienzo;
             emite ( S.comienzo + " : " );
+            // Formar cuadruplo correspondiente
+            cmp.cua.insertar ( new Cuadruplo ( "", "", "", S.comienzo ) );
+            
             // Fin accion semantica
             K ( K );
             emparejar ( "hacer" );
@@ -176,7 +183,13 @@ private void S ( Atributos S )
             S ( S );
             // Accion semantica
             emite ( " goto " + S.comienzo );
+            // Formar cuadruplo correspondiente
+             cmp.cua.insertar ( new Cuadruplo ( "goto", "", "", S.comienzo ) );
+            
             emite ( K.falsa + " : ");
+            // Formar cuadruplo correspondiente
+            cmp.cua.insertar ( new Cuadruplo ( "", "", "", K.falsa ) );
+            
             // Fin accion semantica
             emparejar ( "fin" );
             S ( S1 );
@@ -205,6 +218,10 @@ private void E( Atributos E )
              else {
                  E.Lugar = tempnuevo ();
                  emite ( E.Lugar + ":=" + "[" +num.entrada +"]" + Ep.op + Ep.Lugar );
+                 
+                // Formar cuadruplo correspondiente
+                cmp.cua.insertar ( new Cuadruplo ( Ep.op, "[" +num.entrada +"]", Ep.Lugar, E.Lugar ) );
+                
              }
              // Fin accion semantica 5
 	}
@@ -219,6 +236,9 @@ private void E( Atributos E )
              else {
                 E.Lugar = tempnuevo ();
                 emite ( E.Lugar + ":=" + "[" + numnum.entrada +"]" + Ep.op + Ep.Lugar);
+                
+                // Formar cuadruplo correspondiente
+                cmp.cua.insertar ( new Cuadruplo ( Ep.op, "[" +numnum.entrada +"]", Ep.Lugar, E.Lugar ) );
              }     
             // Fin accion semantica 6
 	}
@@ -233,6 +253,9 @@ private void E( Atributos E )
              else {
                 E.Lugar = tempnuevo ();
                 emite ( E.Lugar + ":=" +"[" + id.entrada +"]"  + Ep.op + Ep.Lugar);
+                
+                // Formar cuadruplo correspondiente
+                cmp.cua.insertar ( new Cuadruplo ( Ep.op, "[" +id.entrada +"]", Ep.Lugar, E.Lugar ) );
              } 
             // Fin accion semantica 7
 	}         
@@ -258,8 +281,16 @@ private void E( Atributos E )
             // Accion semantica
             
             emite ( "if" +E1.Lugar +oprel.lexema +E2.Lugar + " goto " +K.verdadera);
+            // Formar cuadruplo correspondiente
+            cmp.cua.insertar ( new Cuadruplo ( oprel.lexema, E1.Lugar, E2.Lugar, K.verdadera ) );
+            
             emite (  "goto" + K.falsa);
+            // Formar cuadruplo correspondiente
+            cmp.cua.insertar ( new Cuadruplo ( "goto", "", "", K.falsa ) );
+            
             emite ( K.verdadera + " : ");
+            // Formar cuadruplo correspondiente
+            cmp.cua.insertar ( new Cuadruplo ( "", "", "", K.verdadera ) );
             
             // Fin accion semantica
             

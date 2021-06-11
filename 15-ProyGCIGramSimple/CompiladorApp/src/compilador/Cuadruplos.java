@@ -16,4 +16,12 @@ public class Cuadruplos {
     public void insertar ( Cuadruplo c ) {
         cuadruplos.add ( c );
     }
+    
+    public void removerTodos () {
+        cuadruplos.clear ();
+    }
+    
+    public ArrayList<Cuadruplo> getCuadruplos () {
+        return cuadruplos;
+    }
 }
