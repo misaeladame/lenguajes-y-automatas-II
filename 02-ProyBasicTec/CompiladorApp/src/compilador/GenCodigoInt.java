@@ -17,7 +17,7 @@
  *:                  
  *:           	     
  *: Ult.Modif.    :
- *:  Fecha      Modificó            Modificacion
+ *:  Fecha      Modificó                     Modificacion
  *:=============================================================================
  *: 11/Jun/2021  18131209 Misael Adame       Se agregaron 20 acciones semanticas
  *:              18130588 Cristian Piña      para la generación del codigo
@@ -60,17 +60,17 @@ public class GenCodigoInt {
 
     //--------------------------------------------------------------------------
      
-    private void emite (String c3d) {
+    private void emite ( String c3d ) {
         cmp.erroresListener.mostrarCodInt(c3d);
     }
     
-    private String tempnuevo(){
+    private String tempnuevo () {
         return "t" + consecTemp++;
     }
     
     //--------------------------------------------------------------------------
     
-    private String etiqnueva() {
+    private String etiqnueva () {
         return "etiq" + consecEtiq++;
     }
     
@@ -340,7 +340,7 @@ public class GenCodigoInt {
         if ( cmp.be.preAnalisis.complex.equals ( "id" ) || cmp.be.preAnalisis.complex.equals ( "call" ) ||
              cmp.be.preAnalisis.complex.equals ( "if" ) || cmp.be.preAnalisis.complex.equals ( "do" ))  {
             // proposiciones_optativas -> proposicion proposiciones_optativas
-            proposicion (proposicion);
+            proposicion ( proposicion );
             proposiciones_optativas ();
         } /* else {
             // proposiciones_optativias -> empty
@@ -361,16 +361,16 @@ public class GenCodigoInt {
             id = cmp.be.preAnalisis;
             emparejar ( "id" );
             emparejar ( "opasig" );
-            expresion (expresion);
+            expresion ( expresion );
             
-            //Accion semantica 13
-            p = cmp.ts.buscar(id.lexema);
-            if(p != NIL) {
-                emite("[" + p + "]" + ":=" + expresion.Lugar);
+            // Accion semantica 13
+            p = cmp.ts.buscar ( id.lexema );
+            if ( p != NIL ) {
+                emite ( "[" + p + "]" + ":=" + expresion.Lugar );
             } else {
-                cmp.me.error(Compilador.ERR_CODINT, 
-                            "[proposicion] No se encontro el lexema " +id.lexema +
-                            " en la Tabla de Simbolos");
+                cmp.me.error ( Compilador.ERR_CODINT, 
+                               "[proposicion] No se encontro el lexema " +id.lexema +
+                               " en la Tabla de Simbolos");
             }
             //Fin de accion semantica
             
@@ -384,23 +384,23 @@ public class GenCodigoInt {
             // proposicion -> if condicion then proposicicones_optativas else 
             //                proposiciones_optativas end if
             emparejar ( "if" );
-            condicion (condicion);
+            condicion ( condicion );
             
             //Accion semantica 14
             proposicion.cierta = etiqnueva();
             proposicion.falsa = etiqnueva();
             proposicion.siguiente = etiqnueva();
-            emite("if " + condicion.cdc + condicion.op + condicion.cdc_ 
+            emite ( "if " + condicion.cdc + condicion.op + condicion.cdc_ 
                     + " goto " + proposicion.cierta + " goto " 
-                    + proposicion.falsa);
-            emite(proposicion.cierta + ":");
+                    + proposicion.falsa );
+            emite ( proposicion.cierta + ":");
             //Fin de accion semantica
             
             emparejar ( "then" );
             proposiciones_optativas ();
             
             //Accion semantica 15
-            emite("goto " + proposicion.siguiente);
+            emite ( "goto " + proposicion.siguiente);
             //Fin de accion semantica
             
             emparejar ( "else" );
@@ -412,7 +412,7 @@ public class GenCodigoInt {
             proposiciones_optativas ();
             
             //Accion semantica 17
-            emite(proposicion.siguiente + ":");
+            emite ( proposicion.siguiente + ":" );
             //Fin de accion semantica
             
             emparejar ( "end" );
@@ -430,10 +430,10 @@ public class GenCodigoInt {
             
             emparejar ( "do" );
             emparejar ( "while" );
-            condicion (condicion);
+            condicion ( condicion );
             
             //Accion semantica 19
-            emite(proposicion.comienzo + ": if " + condicion.cdc 
+            emite ( proposicion.comienzo + ": if " + condicion.cdc 
                     + condicion.op + condicion.cdc_ + " goto " 
                     + proposicion.cierta 
                     + "\n goto " + proposicion.falsa);
@@ -443,8 +443,8 @@ public class GenCodigoInt {
             proposiciones_optativas ();
             
             //Accion semantica 20
-            emite(" goto " + proposicion.comienzo);
-            emite(proposicion.falsa + ":");
+            emite ( " goto " + proposicion.comienzo );
+            emite ( proposicion.falsa + ":" );
             //Fin de accion semantica
             
             emparejar ( "loop" );
@@ -480,7 +480,7 @@ public class GenCodigoInt {
              cmp.be.preAnalisis.complex.equals ( "num.num" ) || cmp.be.preAnalisis.complex.equals ( "(" ) || 
              cmp.be.preAnalisis.complex.equals ( "literal" ) ) {
             // lista_expresiones -> expresion lista_expresiones' 
-            expresion (expresion);
+            expresion ( expresion );
             lista_expresiones_prima ();
         } /* else {
             // lista_expresiones -> empty
@@ -497,7 +497,7 @@ public class GenCodigoInt {
         if ( cmp.be.preAnalisis.complex.equals ( "," ) ) {
             /*lista_expresiones' -> , expresion lista_expresiones' */
             emparejar ( "," );
-            expresion (expresion);
+            expresion ( expresion );
             lista_expresiones_prima ();
         } /* else { 
             // lista_expresiones' -> empty
@@ -548,25 +548,25 @@ public class GenCodigoInt {
         if ( cmp.be.preAnalisis.complex.equals ( "id" ) || cmp.be.preAnalisis.complex.equals ( "num" ) ||
              cmp.be.preAnalisis.complex.equals ( "num.num" ) || cmp.be.preAnalisis.complex.equals ( "(" ) ) {
             /* expresion -> termino expresion' */
-            termino (termino);
-            expresion_prima (expresion_prima);
+            termino ( termino );
+            expresion_prima ( expresion_prima );
             
-            //Acción semantica 5
-            if(!(expresion_prima.Lugar).equals("")){
+            // Acción semantica 5
+            if ( ! ( expresion_prima.Lugar ).equals ("") ) {
                 expresion.Lugar = tempnuevo();
-                emite(expresion.Lugar + ":=" + expresion_prima.op 
-                        + termino.Lugar + expresion_prima.Lugar);
+                emite ( expresion.Lugar + ":=" + expresion_prima.op 
+                        + termino.Lugar + expresion_prima.Lugar );
             } else {
                 expresion.Lugar = termino.Lugar;
             }
-            //Fin de accion semantica
+            // Fin de accion semantica
         } else if ( cmp.be.preAnalisis.complex.equals ( "literal" ) ){
             // expresion -> literal
             literal = cmp.be.preAnalisis;
             emparejar ( "literal" );
-            //Acción semantica 6
+            // Acción semantica 6
             expresion.Lugar = "[" + literal.entrada + "]";
-            //Fin de accion semantica
+            // Fin de accion semantica
         } else {
             error ( "[expresion] Se esperaba el nombre de un identificador, "
                     + "una constante numérica, o paréntesis o una literal. " 
@@ -579,9 +579,9 @@ public class GenCodigoInt {
     // PRIMEROS(expresion') = {opsuma, empty}
     
     private void expresion_prima (Atributos expresion_prima) {
-        Atributos termino = new Atributos();
-        Atributos expresion_prima1 = new Atributos();
-        Linea_BE opsuma = new Linea_BE();
+        Atributos termino = new Atributos ();
+        Atributos expresion_prima1 = new Atributos ();
+        Linea_BE opsuma = new Linea_BE ();
         
         if ( cmp.be.preAnalisis.complex.equals ( "opsuma" ) ) {
             /* expresion' -> opsuma termino expresiom' */
@@ -589,22 +589,22 @@ public class GenCodigoInt {
             emparejar ( "opsuma" );
             termino (termino);
             expresion_prima(expresion_prima1);
-            //Acción semantica 7
-            if(!(expresion_prima1.Lugar).equals("") ) {
+            // Acción semantica 7
+            if ( ! ( expresion_prima1.Lugar ).equals ("") ) {
                 expresion_prima.Lugar = tempnuevo();
                 expresion_prima.op = opsuma.lexema;
-                emite(expresion_prima.Lugar + ":=" + expresion_prima1.op 
-                        + termino.Lugar + expresion_prima1.Lugar);
+                emite ( expresion_prima.Lugar + ":=" + expresion_prima1.op 
+                        + termino.Lugar + expresion_prima1.Lugar );
             } else {
                 expresion_prima.Lugar = termino.Lugar;
                 expresion_prima.op = opsuma.lexema;
             }
-            //Fin de accion semantica
+            // Fin de accion semantica
             
         } else {
-            //Acción semantica 8
+            // Acción semantica 8
             expresion_prima.Lugar = "";
-            //Fin de acción semantica
+            // Fin de acción semantica
         }
         
     }
@@ -622,15 +622,15 @@ public class GenCodigoInt {
             // termino -> factor termino'
             factor (factor);
             termino_prima (termino_prima);
-            //Acción semantica 9
-            if (!(termino_prima.Lugar).equals("")){
+            // Acción semantica 9
+            if ( ! ( termino_prima.Lugar ).equals ("") ){
                 termino.Lugar = tempnuevo();
-                emite(termino.Lugar + ":=" + termino_prima.op 
-                        + factor.Lugar + termino_prima.Lugar);
+                emite ( termino.Lugar + ":=" + termino_prima.op 
+                        + factor.Lugar + termino_prima.Lugar );
             } else {
                 termino.Lugar = factor.Lugar;
             }
-            //Fin de accion semantica
+            // Fin de accion semantica
         } else {
             error ( "[termino] Se esperaba un termino. "
                     + "No. de Linea " + cmp.be.preAnalisis.numLinea );
@@ -650,24 +650,24 @@ public class GenCodigoInt {
             /* termino' -> opmult factor termino' */
             opmult = cmp.be.preAnalisis;
             emparejar ( "opmult" );
-            factor (factor);
-            termino_prima (termino_prima1);
+            factor ( factor );
+            termino_prima ( termino_prima1 );
             
-            //Accion semantica 10
-            if(!(termino_prima1.Lugar).equals("") ){
+            // Accion semantica 10
+            if( ! ( termino_prima1.Lugar ).equals ("") ){
                 termino_prima.Lugar = tempnuevo();
                 termino_prima.op = opmult.lexema;
-                emite(termino_prima.Lugar + ":=" + termino_prima1.op 
+                emite ( termino_prima.Lugar + ":=" + termino_prima1.op 
                         + factor.Lugar + termino_prima1.Lugar );
             } else {
                 termino_prima.Lugar = factor.Lugar;
                 termino_prima.op = opmult.lexema;
             }
-            //Fin de accion semantica
+            // Fin de accion semantica
         } else{
-            //Accion semantica 11
+            // Accion semantica 11
             termino_prima.Lugar = "";
-            //Fin de accion semantica
+            // Fin de accion semantica
         }
         
     }
@@ -688,44 +688,44 @@ public class GenCodigoInt {
             emparejar ( "id" );
             factor_prima ();
             
-            //Acción semantica 1
-            p = cmp.ts.buscar(id.lexema);
-            if(p != NIL){
+            // Acción semantica 1
+            p = cmp.ts.buscar ( id.lexema );
+            if ( p != NIL ) {
                 factor.Lugar = "[" + p + "]";
             } else {
-                cmp.me.error(Compilador.ERR_CODINT, 
-                            "[programa] No se encontro el lexema " +id.lexema +
-                            " en la Tabla de Simbolos");
+                cmp.me.error ( Compilador.ERR_CODINT, 
+                               "[programa] No se encontro el lexema " +id.lexema +
+                               " en la Tabla de Simbolos");
             }
-            //Fin de acción semantica
+            // Fin de acción semantica
         }
          else if ( cmp.be.preAnalisis.complex.equals ( "num" ) ) {
             // factor -> num
             num = cmp.be.preAnalisis;
             emparejar ( "num" );
             
-            //Acción semantica 2
+            // Acción semantica 2
             factor.Lugar = "[" + num.entrada + "]";
-            //Fin de acción semantica
+            // Fin de acción semantica
         }
         else if ( cmp.be.preAnalisis.complex.equals ( "num.num" ) ) {
             // factor -> num.num
             numnum = cmp.be.preAnalisis;
             emparejar ( "num.num" );
             
-            //Acción semantica 3
+            // Acción semantica 3
             factor.Lugar = "[" + numnum.entrada + "]";
-            //Fin de acción semantica
+            // Fin de acción semantica
         }
         else if ( cmp.be.preAnalisis.complex.equals ( "(" ) ){
             // factor -> ( expresion )
             emparejar ( "(" );
-            expresion (expresion);
+            expresion ( expresion );
             emparejar ( ")" );
             
-            //Acción semantica 4
+            // Acción semantica 4
             factor.Lugar = expresion.Lugar;
-            //Fin de acción semantica
+            // Fin de acción semantica
         } else {
             error ( "[factor] Se esperaba el nombre de un identificador, "
                     + "una constante numérica, o paréntesis. "

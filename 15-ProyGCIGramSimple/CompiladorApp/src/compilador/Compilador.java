@@ -98,6 +98,7 @@ public class Compilador {
 	public void generarCodigoInt(){
         me.inicializar ();
         be.restablecer ();             // Colocar el preAnalisis al inicio del buffer
+        cua.removerTodos();
         gci.generar    ();             // Arrancar la generacion de codigo intermedio
 	}
     

@@ -7,9 +7,11 @@ z : caracter
 
 inicio
    a := 0
-   b := 3.14
-   c := x
-   y := 123
-   z := 143.1234
-   x := a
+   mientras a > 10 hacer
+   inicio
+   	a := 3
+	b := 3.1416
+
+	 
+   fin
 fin
