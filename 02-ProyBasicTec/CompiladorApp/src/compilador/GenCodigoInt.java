@@ -367,6 +367,8 @@ public class GenCodigoInt {
             p = cmp.ts.buscar ( id.lexema );
             if ( p != NIL ) {
                 emite ( "[" + p + "]" + ":=" + expresion.Lugar );
+                // FORMAR EL CUADRUPLO CORRESPONDIENTE
+                cmp.cua.insertar ( new Cuadruplo ( ":=", expresion.Lugar, "", "[" +p +"]"  ) );
             } else {
                 cmp.me.error ( Compilador.ERR_CODINT, 
                                "[proposicion] No se encontro el lexema " +id.lexema +
@@ -391,9 +393,14 @@ public class GenCodigoInt {
             proposicion.falsa = etiqnueva();
             proposicion.siguiente = etiqnueva();
             emite ( "if " + condicion.cdc + condicion.op + condicion.cdc_ 
-                    + " goto " + proposicion.cierta + " goto " 
+                    + " goto " + proposicion.cierta + "\n goto " 
                     + proposicion.falsa );
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( condicion.op, condicion.cdc, condicion.cdc_, proposicion.cierta ) ); // DUDA
+            cmp.cua.insertar ( new Cuadruplo ( "goto", "", "", proposicion.falsa ));
             emite ( proposicion.cierta + ":");
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( "", "", "", proposicion.cierta ) );
             //Fin de accion semantica
             
             emparejar ( "then" );
@@ -401,18 +408,24 @@ public class GenCodigoInt {
             
             //Accion semantica 15
             emite ( "goto " + proposicion.siguiente);
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( "goto", "", "", proposicion.siguiente ) );
             //Fin de accion semantica
             
             emparejar ( "else" );
             
             //Accion semantica 16
             emite(proposicion.falsa + ":");
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( "", "", "", proposicion.falsa  ) );
             //Fin de accion semantica
             
             proposiciones_optativas ();
             
             //Accion semantica 17
             emite ( proposicion.siguiente + ":" );
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( "", "", "", proposicion.siguiente  ) );
             //Fin de accion semantica
             
             emparejar ( "end" );
@@ -436,15 +449,25 @@ public class GenCodigoInt {
             emite ( proposicion.comienzo + ": if " + condicion.cdc 
                     + condicion.op + condicion.cdc_ + " goto " 
                     + proposicion.cierta 
-                    + "\n goto " + proposicion.falsa);
+                    + "\ngoto " + proposicion.falsa);
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( condicion.op, condicion.cdc, condicion.cdc_, proposicion.cierta ) ); // DUDA
+            cmp.cua.insertar ( new Cuadruplo ( "goto", "", "", proposicion.falsa ) ); 
+            
             emite(proposicion.cierta + ":");
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( "", "", "", proposicion.cierta  ) );
             //Fin de accion semantica
             
             proposiciones_optativas ();
             
             //Accion semantica 20
             emite ( " goto " + proposicion.comienzo );
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( "goto", "", "", proposicion.comienzo  ) );
             emite ( proposicion.falsa + ":" );
+            // FORMAR EL CUADRUPLO CORRESPONDIENTE
+            cmp.cua.insertar ( new Cuadruplo ( "", "", "", proposicion.falsa  ) );
             //Fin de accion semantica
             
             emparejar ( "loop" );
@@ -556,6 +579,8 @@ public class GenCodigoInt {
                 expresion.Lugar = tempnuevo();
                 emite ( expresion.Lugar + ":=" + expresion_prima.op 
                         + termino.Lugar + expresion_prima.Lugar );
+                // FORMAR EL CUADRUPLO CORRESPONDIENTE
+                cmp.cua.insertar ( new Cuadruplo ( expresion_prima.op, termino.Lugar, expresion_prima.Lugar, expresion.Lugar  ) ); // DUDA
             } else {
                 expresion.Lugar = termino.Lugar;
             }
@@ -595,6 +620,8 @@ public class GenCodigoInt {
                 expresion_prima.op = opsuma.lexema;
                 emite ( expresion_prima.Lugar + ":=" + expresion_prima1.op 
                         + termino.Lugar + expresion_prima1.Lugar );
+                // FORMAR EL CUADRUPLO CORRESPONDIENTE
+                cmp.cua.insertar ( new Cuadruplo ( expresion_prima.op, termino.Lugar, expresion_prima1.Lugar, expresion_prima.Lugar  ) ); // DUDA
             } else {
                 expresion_prima.Lugar = termino.Lugar;
                 expresion_prima.op = opsuma.lexema;
@@ -627,6 +654,8 @@ public class GenCodigoInt {
                 termino.Lugar = tempnuevo();
                 emite ( termino.Lugar + ":=" + termino_prima.op 
                         + factor.Lugar + termino_prima.Lugar );
+                // FORMAR EL CUADRUPLO CORRESPONDIENTE
+                cmp.cua.insertar ( new Cuadruplo ( termino_prima.op, factor.Lugar, termino_prima.Lugar, termino.Lugar  ) ); // DUDA
             } else {
                 termino.Lugar = factor.Lugar;
             }
@@ -659,6 +688,8 @@ public class GenCodigoInt {
                 termino_prima.op = opmult.lexema;
                 emite ( termino_prima.Lugar + ":=" + termino_prima1.op 
                         + factor.Lugar + termino_prima1.Lugar );
+                // FORMAR EL CUADRUPLO CORRESPONDIENTE
+                cmp.cua.insertar ( new Cuadruplo ( termino_prima1.op, factor.Lugar, termino_prima1.Lugar, termino_prima.Lugar  ) ); // DUDA
             } else {
                 termino_prima.Lugar = factor.Lugar;
                 termino_prima.op = opmult.lexema;

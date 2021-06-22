@@ -28,6 +28,8 @@
 
 package compilador;
 
+import java.util.ArrayList;
+
 
 public class Compilador {
 
@@ -49,7 +51,7 @@ public class Compilador {
 	ErroresListener erroresListener = null;
 
 	GenCodigoInt gci = new GenCodigoInt(this);
-    
+        Cuadruplos   cua = new Cuadruplos ( this );
 
 	//--------------------------------------------------------------------------
 	// Constructor de Default
@@ -95,6 +97,7 @@ public class Compilador {
 	public void generarCodigoInt(){
         me.inicializar ();
         be.restablecer ();             // Colocar el preAnalisis al inicio del buffer
+        cua.removerTodos ();
         gci.generar    ();             // Arrancar la generacion de codigo intermedio
 	}
     
@@ -131,6 +134,10 @@ public class Compilador {
     
 	//--------------------------------------------------------------------------
 	
+        public ArrayList<Cuadruplo> getCuadruplos () {
+            return cua.getCuadruplos ();
+        }
+        
 	//--------------------------------------------------------------------------
     // 24/Oct/2012
 

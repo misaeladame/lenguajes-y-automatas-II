@@ -40,8 +40,10 @@ import javax.swing.table.DefaultTableModel;
 
 import compilador.ErroresListener;
 import compilador.Compilador;
+import compilador.Cuadruplo;
 import compilador.Linea_BE;
 import compilador.Linea_TS;
+import java.util.ArrayList;
 
 public class CompiladorFrame extends javax.swing.JFrame implements ErroresListener {
 
@@ -1198,6 +1200,7 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
         jtxaMensajes.append("GENERACION DE CODIGO INTERMEDIO INICIADO....\n");
         jtxaCodigoIntermedio.setText ( "" );
         compilador.generarCodigoInt();
+        actualizarGUICuadruplos ();
         jtxaMensajes.append("*******Codigo Intermedio terminado*******\n");
         jtxaMensajes.append(compilador.getTotErrores ( Compilador.ERR_CODINT )
                 + "  error(es) encontrado(s).\n\n");
@@ -1458,6 +1461,30 @@ public class CompiladorFrame extends javax.swing.JFrame implements ErroresListen
     }
 
     //--------------------------------------------------------------------------
+    private void actualizarGUICuadruplos () {
+        String[] nombresCol = { "#", "Arg1", "Arg2", "Resultado" };
+        ArrayList<Cuadruplo> cuadruplos = compilador.getCuadruplos ();
+        Object[][] datos = new Object [ cuadruplos.size() ] [ 4 ];
+
+        int i = 0;
+        for ( Cuadruplo c : cuadruplos ) {
+            datos[i][0] = c.op;
+            datos[i][1] = c.arg1;
+            datos[i][2] = c.arg2;
+            datos[i][3] = c.resultado;
+            i++;
+        }
+
+
+        // Cambiamos el modelo actual del JTable de la Tabla de Simbolos por uno 
+        // nuevo con los datos de arriba. Se perderan las opciones de celdas 
+        // editables/ajustables, etc.
+        DefaultTableModel modelo = new DefaultTableModel(datos, nombresCol);
+        jtblCuadruplos.setModel(
+                new DefaultTableModel ( datos, nombresCol ) );
+    }
+    //--------------------------------------------------------------------------
+    
     private void actualizarTituloEditor() {
         if (archivoSQL != null) {
             nombArchSQL = archivoSQL.getName();
