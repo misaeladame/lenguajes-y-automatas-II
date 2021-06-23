@@ -6,14 +6,15 @@
  *:        SEMESTRE: ______________            HORA: ______________ HRS
  *:                                   
  *:               
- *:    # Clase con la funcionalidad del Generador de COdigo Intermedio
+ *:    # Clase con la funcionalidad del Generador de Codigo Intermedio
  *                 
  *:                           
  *: Archivo       : GenCodigoInt.java
  *: Autor         : Fernando Gil  
  *: Fecha         : 03/SEP/2014
  *: Compilador    : Java JDK 7
- *: Descripción   :  
+ *: Descripción   : Realiza las funciones para generar Codigo de 3 direcciones
+ *:                 de las instrucciones dadas por el usuario
  *:                  
  *:           	     
  *: Ult.Modif.    :
@@ -22,6 +23,10 @@
  *: 11/Jun/2021  18131209 Misael Adame       Se agregaron 20 acciones semanticas
  *:              18130588 Cristian Piña      para la generación del codigo
  *:              17130772 Sergio Chairez     intermedio
+ *:
+ *: 21/Jun/2021  18131209 Misael Adame       Se formaron los cuadruplos
+ *:              18130588 Cristian Piña      correspondientes a cada emite
+ *:              17130772 Sergio Chairez     
  *:-----------------------------------------------------------------------------
  */
 
@@ -366,7 +371,7 @@ public class GenCodigoInt {
             // Accion semantica 13
             p = cmp.ts.buscar ( id.lexema );
             if ( p != NIL ) {
-                emite ( "[" + p + "]" + ":=" + expresion.Lugar );
+                emite ( "[" + p + "]" + " := " + expresion.Lugar );
                 // FORMAR EL CUADRUPLO CORRESPONDIENTE
                 cmp.cua.insertar ( new Cuadruplo ( ":=", expresion.Lugar, "", "[" +p +"]"  ) );
             } else {
@@ -392,8 +397,8 @@ public class GenCodigoInt {
             proposicion.cierta = etiqnueva();
             proposicion.falsa = etiqnueva();
             proposicion.siguiente = etiqnueva();
-            emite ( "if " + condicion.cdc + condicion.op + condicion.cdc_ 
-                    + " goto " + proposicion.cierta + "\n goto " 
+            emite ( "if " + condicion.cdc + " " +condicion.op + " " + condicion.cdc_ 
+                    + " goto " + proposicion.cierta + "\ngoto " 
                     + proposicion.falsa );
             // FORMAR EL CUADRUPLO CORRESPONDIENTE
             cmp.cua.insertar ( new Cuadruplo ( condicion.op, condicion.cdc, condicion.cdc_, proposicion.cierta ) ); // DUDA
@@ -447,7 +452,7 @@ public class GenCodigoInt {
             
             //Accion semantica 19
             emite ( proposicion.comienzo + ": if " + condicion.cdc 
-                    + condicion.op + condicion.cdc_ + " goto " 
+                    + " " + condicion.op + " " + condicion.cdc_ + " goto " 
                     + proposicion.cierta 
                     + "\ngoto " + proposicion.falsa);
             // FORMAR EL CUADRUPLO CORRESPONDIENTE
@@ -462,7 +467,7 @@ public class GenCodigoInt {
             proposiciones_optativas ();
             
             //Accion semantica 20
-            emite ( " goto " + proposicion.comienzo );
+            emite ( "goto " + proposicion.comienzo );
             // FORMAR EL CUADRUPLO CORRESPONDIENTE
             cmp.cua.insertar ( new Cuadruplo ( "goto", "", "", proposicion.comienzo  ) );
             emite ( proposicion.falsa + ":" );
@@ -577,8 +582,8 @@ public class GenCodigoInt {
             // Acción semantica 5
             if ( ! ( expresion_prima.Lugar ).equals ("") ) {
                 expresion.Lugar = tempnuevo();
-                emite ( expresion.Lugar + ":=" + expresion_prima.op 
-                        + termino.Lugar + expresion_prima.Lugar );
+                emite ( expresion.Lugar + " := " + expresion_prima.op + " " 
+                        + termino.Lugar + " " + expresion_prima.Lugar );
                 // FORMAR EL CUADRUPLO CORRESPONDIENTE
                 cmp.cua.insertar ( new Cuadruplo ( expresion_prima.op, termino.Lugar, expresion_prima.Lugar, expresion.Lugar  ) ); // DUDA
             } else {
@@ -618,8 +623,8 @@ public class GenCodigoInt {
             if ( ! ( expresion_prima1.Lugar ).equals ("") ) {
                 expresion_prima.Lugar = tempnuevo();
                 expresion_prima.op = opsuma.lexema;
-                emite ( expresion_prima.Lugar + ":=" + expresion_prima1.op 
-                        + termino.Lugar + expresion_prima1.Lugar );
+                emite ( expresion_prima.Lugar + " := " + expresion_prima1.op + " "
+                        + termino.Lugar + " " + expresion_prima1.Lugar );
                 // FORMAR EL CUADRUPLO CORRESPONDIENTE
                 cmp.cua.insertar ( new Cuadruplo ( expresion_prima.op, termino.Lugar, expresion_prima1.Lugar, expresion_prima.Lugar  ) ); // DUDA
             } else {
@@ -652,8 +657,8 @@ public class GenCodigoInt {
             // Acción semantica 9
             if ( ! ( termino_prima.Lugar ).equals ("") ){
                 termino.Lugar = tempnuevo();
-                emite ( termino.Lugar + ":=" + termino_prima.op 
-                        + factor.Lugar + termino_prima.Lugar );
+                emite ( termino.Lugar + " := " + termino_prima.op + " "
+                        + factor.Lugar + " " + termino_prima.Lugar );
                 // FORMAR EL CUADRUPLO CORRESPONDIENTE
                 cmp.cua.insertar ( new Cuadruplo ( termino_prima.op, factor.Lugar, termino_prima.Lugar, termino.Lugar  ) ); // DUDA
             } else {
@@ -686,8 +691,8 @@ public class GenCodigoInt {
             if( ! ( termino_prima1.Lugar ).equals ("") ){
                 termino_prima.Lugar = tempnuevo();
                 termino_prima.op = opmult.lexema;
-                emite ( termino_prima.Lugar + ":=" + termino_prima1.op 
-                        + factor.Lugar + termino_prima1.Lugar );
+                emite ( termino_prima.Lugar + " := " + termino_prima1.op + " "
+                        + factor.Lugar + " " + termino_prima1.Lugar );
                 // FORMAR EL CUADRUPLO CORRESPONDIENTE
                 cmp.cua.insertar ( new Cuadruplo ( termino_prima1.op, factor.Lugar, termino_prima1.Lugar, termino_prima.Lugar  ) ); // DUDA
             } else {

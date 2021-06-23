@@ -20,8 +20,11 @@
  *:                 de sentencias de lenguaje Pascal .
  *:           	     
  *: Ult.Modif.    :
- *:  Fecha      Modificó            Modificacion
+ *: Fecha        Modificó                    Modificacion
  *:=============================================================================
+ *: 21/Jun/2021  18131209 Misael Adame       Se agrego el atributo:
+ *:              18130588 Cristian Piña      cua 
+ *:              17130772 Sergio Chairez   
  *:-----------------------------------------------------------------------------
  */
 
